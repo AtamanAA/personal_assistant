@@ -1,7 +1,7 @@
 import os
 import subprocess
-from random import choice
 
+from fake_useragent import UserAgent
 from selenium.webdriver.chrome.options import Options
 
 from custom_undetected_chromedriver import CustomUndetectedChromeDriver
@@ -9,22 +9,16 @@ from custom_undetected_chromedriver import CustomUndetectedChromeDriver
 
 class ChromeBrowser:
 
-    def __init__(self, headless_mode: bool = True, captcha_app: bool = False):
+    def __init__(self, headless_mode: bool = True):
         self.headless_mode = headless_mode
-        # self.captcha_app = captcha_app
 
     def __set_up(self):
         options = Options()
-        _ua = choice(list(map(str.rstrip, open("user_agent_pc.txt").readlines())))
-        options.add_argument(f'--user-agent={_ua}')
+        ua = UserAgent(platforms='pc').random
+        print(f"User-agent: {ua}")
+        options.add_argument(f'--user-agent={ua}')
         if self.headless_mode:
             options.add_argument('--headless')  # headless mode
-        # if self.captcha_app:
-        #     _path = os.path.abspath("captcha")
-        #     options.add_argument(f'--load-extension={_path}')
-        #     self.driver = CustomUndetectedChromeDriver(version_main=int(self.__get_chrome_version), options=options,
-        #                                                headless=False)
-        #     return
         self.driver = CustomUndetectedChromeDriver(version_main=int(self.__get_chrome_version), options=options,
                                                    headless=False)
 
