@@ -62,11 +62,12 @@ class UserRegisterDemo:
         if check:
             print("Success check")
             # TODO: make screenshot
+        time.sleep(30)
+        self.driver.quit()
 
 
 if __name__ == '__main__':
     try:
         UserRegisterDemo().new_register()
-        time.sleep(30)
     except Exception as error:
         print(error)
