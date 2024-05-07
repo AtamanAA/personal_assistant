@@ -17,6 +17,7 @@ class ChromeBrowser:
         ua = UserAgent(platforms='pc').random
         print(f"User-agent: {ua}")
         options.add_argument(f'--user-agent={ua}')
+        options.add_argument("--window-size=800,600")
         if self.headless_mode:
             options.add_argument('--headless')  # headless mode
         self.driver = CustomUndetectedChromeDriver(version_main=int(self.__get_chrome_version), options=options,

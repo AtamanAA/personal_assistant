@@ -182,3 +182,4 @@ test.pdf
 /mprofile_*.dat
 .docker_env
 dbip-country-ipv4.csv
+/screenshots/
