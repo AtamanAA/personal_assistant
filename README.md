@@ -13,7 +13,7 @@
 ## Run demo scripts
 ```bash
     python solve_recapcha_demo.py
-    python docstudio_login_demo.py
+    python docstudio_sign_demo.py
 ```
 
 
