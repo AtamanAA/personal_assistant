@@ -183,3 +183,4 @@ test.pdf
 .docker_env
 dbip-country-ipv4.csv
 /screenshots/
+/slide_capcha_img/
