@@ -17,6 +17,18 @@ DEMO_URL = "https://www.geetest.com/en/demo"
 
 
 class SlideCapchaSolveDemo:
+    """
+    Solve slide capcha
+    Main resource: https://filipvitas.medium.com/how-to-solve-geetest-slider-captcha-with-js-ac764c4e9905
+
+    Base scenario:
+    1. Go to the target web page
+    2. Download capcha pictures
+    3. Find the difference between original image and capcha image and calculate center position diff
+    4. Calculate the centre position puzzle image
+    5. Calculate the distance the slider moves: center position diff - center position puzzle
+    6. Move the slider. Use a few steps with pauses and also use y coordinate to move.
+    """
     def __init__(self, url: str = DEMO_URL):
         self.url = url
         self.driver = ChromeBrowser(headless_mode=False).get_driver()  # for demo: headless_mode=False
