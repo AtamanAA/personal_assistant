@@ -54,6 +54,11 @@ class SlideCapchaSolveDemo:
     @staticmethod
     def _save_slider_capcha_images(images):
         directory = f'{BASE_DIR}/slide_capcha_img/'
+
+        # Create the directory if it doesn't exist
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+
         for filename in os.listdir(directory):
             file_path = os.path.join(directory, filename)
             try:
