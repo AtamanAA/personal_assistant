@@ -11,7 +11,7 @@
     pip install -r requirements.txt
     
 
-    apt install ffmpeg -y
+#    apt install ffmpeg -y
 ```
 
 ## Install google chrome

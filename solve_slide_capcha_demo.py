@@ -10,6 +10,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
+from variables import BASE_DIR
 
 from driver_chrome import ChromeBrowser
 
@@ -52,7 +53,7 @@ class SlideCapchaSolveDemo:
 
     @staticmethod
     def _save_slider_capcha_images(images):
-        directory = './slide_capcha_img/'
+        directory = f'{BASE_DIR}/slide_capcha_img/'
         for filename in os.listdir(directory):
             file_path = os.path.join(directory, filename)
             try:
@@ -65,7 +66,7 @@ class SlideCapchaSolveDemo:
         for name, image_data in zip(names, images):
             image_data = image_data.replace('data:image/png;base64,', '')
             image_bytes = base64.b64decode(image_data)
-            file_path = f'./slide_capcha_img/{name}'
+            file_path = f'{BASE_DIR}/slide_capcha_img/{name}'
 
             # # Remove existing file if it exists
             # if os.path.exists(file_path):
@@ -82,7 +83,7 @@ class SlideCapchaSolveDemo:
         for name, image_data in zip(names, images):
             image_data = image_data.replace('data:image/png;base64,', '')
             image_bytes = base64.b64decode(image_data)
-            file_path = f'./slide_capcha_img/{name}'
+            file_path = f'{BASE_DIR}/slide_capcha_img/{name}'
 
             # Remove existing file if it exists
             if os.path.exists(file_path):
@@ -95,8 +96,8 @@ class SlideCapchaSolveDemo:
 
     def _save_diff_image(self):
         # Load original and captcha images
-        original_image = Image.open('./slide_capcha_img/original.png')
-        captcha_image = Image.open('./slide_capcha_img/capcha.png')
+        original_image = Image.open(f'{BASE_DIR}/slide_capcha_img/original.png')
+        captcha_image = Image.open(f'{BASE_DIR}/slide_capcha_img/capcha.png')
 
         # Get the size of the images
         width, height = original_image.size
@@ -108,16 +109,16 @@ class SlideCapchaSolveDemo:
         mismatch = pixelmatch(original_image, captcha_image, img_diff, includeAA=True)
 
         # Save the difference image
-        img_diff.save('./slide_capcha_img/diff.png')
+        img_diff.save(f'{BASE_DIR}/slide_capcha_img/diff.png')
         print("Write_picture_diffing")
 
     @staticmethod
     def _update_diff_image():
         # Copy the original diff image to a new file
-        shutil.copyfile('./slide_capcha_img/diff.png', './slide_capcha_img/diff_original.png')
+        shutil.copyfile(f'{BASE_DIR}/slide_capcha_img/diff.png', f'{BASE_DIR}/slide_capcha_img/diff_original.png')
 
         # Load the original diff image
-        src_image = cv2.imread('./slide_capcha_img/diff_original.png')
+        src_image = cv2.imread(f'{BASE_DIR}/slide_capcha_img/diff_original.png')
 
         # Convert to grayscale
         src_gray = cv2.cvtColor(src_image, cv2.COLOR_BGR2GRAY)
@@ -135,13 +136,13 @@ class SlideCapchaSolveDemo:
         dst = cv2.dilate(dst, kernel, iterations=1)
 
         # Save the processed image back to diff.png
-        cv2.imwrite('./slide_capcha_img/diff.png', dst)
+        cv2.imwrite(f'{BASE_DIR}/slide_capcha_img/diff.png', dst)
 
         print("Locate_diff")
 
     def _find_diff_position(self):
         # Read the diff image
-        src_image = cv2.imread('./slide_capcha_img/diff.png')
+        src_image = cv2.imread(f'{BASE_DIR}/slide_capcha_img/diff.png')
 
         # Convert to grayscale
         src_gray = cv2.cvtColor(src_image, cv2.COLOR_BGR2GRAY)
@@ -169,21 +170,21 @@ class SlideCapchaSolveDemo:
         cv2.putText(src_image, 'center', (cx + 4, cy + 3), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), thickness=1)
 
         # Write the modified image back to diff.png
-        cv2.imwrite('./slide_capcha_img/diff.png', src_image)
+        cv2.imwrite(f'{BASE_DIR}/slide_capcha_img/diff.png', src_image)
         print("FIND target puzzle center")
         return cx, cy
 
     def _find_puzzle_centre_position(self):
 
         # Load original and captcha images
-        original_image = Image.open('./slide_capcha_img/puzzle.png')
+        original_image = Image.open(f'{BASE_DIR}/slide_capcha_img/puzzle.png')
         # empty_image = Image.open('slide_capcha_img/puzzle.png')
 
         # Get the size of the images
         width, height = original_image.size
 
         empty_img = Image.new("RGBA", (width, height), (0, 0, 0, 0))
-        empty_img.save('./slide_capcha_img/empty_img.png')
+        empty_img.save(f'{BASE_DIR}/slide_capcha_img/empty_img.png')
 
         # Create a diff image
         img_diff = Image.new("RGBA", (width, height), (0, 0, 0, 0))
@@ -192,16 +193,16 @@ class SlideCapchaSolveDemo:
         mismatch = pixelmatch(original_image, empty_img, img_diff, includeAA=True)
 
         # Save the difference image
-        img_diff.save('./slide_capcha_img/puzzle_diff.png')
+        img_diff.save(f'{BASE_DIR}/slide_capcha_img/puzzle_diff.png')
         print("Write_puzzle_dif_img")
 
 
 
         # Copy the original diff image to a new file
-        shutil.copyfile('./slide_capcha_img/puzzle_diff.png', './slide_capcha_img/puzzle_diff_original.png')
+        shutil.copyfile(f'{BASE_DIR}/slide_capcha_img/puzzle_diff.png', f'{BASE_DIR}/slide_capcha_img/puzzle_diff_original.png')
 
         # Load the original diff image
-        src_image = cv2.imread('./slide_capcha_img/puzzle_diff_original.png')
+        src_image = cv2.imread(f'{BASE_DIR}/slide_capcha_img/puzzle_diff_original.png')
 
         # Convert to grayscale
         src_gray = cv2.cvtColor(src_image, cv2.COLOR_BGR2GRAY)
@@ -219,12 +220,12 @@ class SlideCapchaSolveDemo:
         dst = cv2.dilate(dst, kernel, iterations=1)
 
         # Save the processed image back to diff.png
-        cv2.imwrite('./slide_capcha_img/puzzle_diff.png', dst)
+        cv2.imwrite(f'{BASE_DIR}/slide_capcha_img/puzzle_diff.png', dst)
 
         print("Locate_puzzle_diff")
 
         # Read the diff image
-        src_image = cv2.imread('./slide_capcha_img/puzzle_diff.png')
+        src_image = cv2.imread(f'{BASE_DIR}/slide_capcha_img/puzzle_diff.png')
 
         # Convert to grayscale
         src_gray = cv2.cvtColor(src_image, cv2.COLOR_BGR2GRAY)
@@ -251,7 +252,7 @@ class SlideCapchaSolveDemo:
         cv2.putText(src_image, 'center', (cx + 4, cy + 3), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), thickness=1)
 
         # Write the modified image back to diff.png
-        cv2.imwrite('./slide_capcha_img/puzzle_diff.png', src_image)
+        cv2.imwrite(f'{BASE_DIR}/slide_capcha_img/puzzle_diff.png', src_image)
         print("FIND initial puzzle center")
         return cx, cy
 
