@@ -18,7 +18,7 @@ class ChromeBrowser:
         ua = UserAgent(platforms='pc').random
         print(f"User-agent: {ua}")
         options.add_argument(f'--user-agent={ua}')
-        options.add_argument("--window-size=800,600")
+        options.add_argument("--window-size=1200,2000")
         options.add_argument("--enable-javascript")
 
         # TODO: add user-data-dir
