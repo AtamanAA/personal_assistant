@@ -9,6 +9,17 @@
 ```bash
     source venv/bin/activate
     pip install -r requirements.txt
+    
+
+    apt install ffmpeg -y
+```
+
+## Install google chrome
+```bash
+    sudo apt install fonts-liberation libu2f-udev libvulkan1
+    wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb    
+    sudo dpkg -i google-chrome-stable_current_amd64.deb
+
 ```
 
 ## Run demo scripts
