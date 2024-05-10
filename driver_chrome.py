@@ -39,6 +39,7 @@ class ChromeBrowser:
         print(f"Browser version main: {version_main}")
         self.driver = CustomUndetectedChromeDriver(version_main=int(self.__get_chrome_version), options=options,
                                                    headless=self.headless)
+        print("Set up driver")
 
     @property
     def __get_chrome_version(self):
