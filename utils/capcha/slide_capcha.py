@@ -11,6 +11,20 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
+import cv2 as cv
+import numpy as np
+from matplotlib import pyplot as plt
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from skimage.feature import match_template
+from skimage.io import imread, imshow
+from skimage.color import rgb2gray
+from matplotlib.patches import Circle
+from skimage import transform
+
+
 from variables import BASE_DIR
 
 DEMO_URL = "https://www.geetest.com/en/demo"
@@ -347,6 +361,83 @@ class SlideCapchaSolve:
         print("FIND target center")
         return cx, cy
 
+    def _find_target_centre_position_2(self):
+        img_rgb = cv.imread(f'{BASE_DIR}/slide_capcha_img/capcha.png')
+        assert img_rgb is not None, "file could not be read, check with os.path.exists()"
+        img_gray = cv.cvtColor(img_rgb, cv.COLOR_BGR2GRAY)
+        cv.imwrite(f'{BASE_DIR}/slide_capcha_img/img_gray.png', img_gray)
+
+        template = cv.imread(f'{BASE_DIR}/slide_capcha_img/puzzle.png', cv.IMREAD_GRAYSCALE)
+        assert template is not None, "file could not be read, check with os.path.exists()"
+        w, h = template.shape[::-1]
+        cv.imwrite(f'{BASE_DIR}/slide_capcha_img/template.png', template)
+
+        res = cv.matchTemplate(img_gray, template, cv.TM_CCOEFF_NORMED)
+        threshold = 0.8
+        loc = np.where(res >= threshold)
+        for pt in zip(*loc[::-1]):
+            cv.rectangle(img_rgb, pt, (pt[0] + w, pt[1] + h), (0, 0, 255), 2)
+
+        cv.imwrite(f'{BASE_DIR}/slide_capcha_img/res.png', img_rgb)
+
+    def _find_target_centre_position_3(self):
+        # Load image
+        # img = imread(f'{BASE_DIR}/slide_capcha_img/capcha.png')
+        img = imread(f'{BASE_DIR}/slide_capcha_img/capcha.png')[:, :, :3]  # Remove alpha channel
+        img_gs = rgb2gray(img)
+
+        # Plot
+        fig, ax = plt.subplots(1, 2, figsize=(16, 8))
+        ax[0].imshow(img)
+        ax[0].set_title("Original Image of Where's Wally?")
+        ax[0].set_axis_off()
+        ax[1].imshow(img_gs, cmap='gray')
+        ax[1].set_title("Grayscale Image of Where's Wally?")
+        ax[1].set_axis_off()
+        plt.show()
+
+        # Get a template image and match it with the grayscale image
+        # img_template = img_gs[100:120, 80:100]
+
+        img_template = imread(f'{BASE_DIR}/slide_capcha_img/puzzle.png')[:, :, :3]  # Remove alpha channel
+        img_template_gs = rgb2gray(img_template)
+        # img_template_gs = img_template_gs[82:142, 2:62]
+
+        img_template_gs = img_template_gs[13:73, 2:62]
+
+        # img_template_gs = img_gs[100:120, 80:100]
+
+        # Plot
+        fig, ax = plt.subplots(1, 2, figsize=(16, 8))
+        # ax[0].imshow(img)
+        # ax[0].set_title("puzzle_test")
+        ax[0].set_axis_off()
+        ax[1].imshow(img_template_gs, cmap='gray')
+        ax[1].set_title("puzzle_test")
+        ax[1].set_axis_off()
+        plt.show()
+
+
+        result = match_template(img_gs, img_template_gs)
+        fig, ax = plt.subplots(1, 1, figsize=(8, 8))
+        ax.imshow(result, cmap='viridis')
+        ax.set_title("Result of Template Matching")
+        ax.set_axis_off()
+        plt.show()
+
+        # Getting the max
+        x, y = np.unravel_index(np.argmax(result), result.shape)
+        imshow(img_gs)
+        template_width, template_height = img_template_gs.shape
+        rect = plt.Rectangle((y, x), template_height, template_width, color='red',
+                             fc='none')
+        plt.gca().add_patch(rect)
+        plt.title('Grayscale Image with Bounding Box around Wally')
+        plt.axis('off')
+        plt.show()
+
+        return True
+
     def move_slider(self, cx, cy):
         print("Find slider handle")
 
@@ -418,6 +509,7 @@ class SlideCapchaSolve:
 if __name__ == '__main__':
     try:
         # SlideCapchaSolve().start_solve()
-        SlideCapchaSolve(driver=None, capcha_frame=None)._find_target_centre_position()
+        # SlideCapchaSolve(driver=None, capcha_frame=None)._find_target_centre_position()
+        SlideCapchaSolve(driver=None, capcha_frame=None)._find_target_centre_position_3()
     except Exception as error:
         print(error)

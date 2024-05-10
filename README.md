@@ -12,9 +12,9 @@
 
 ## Run demo scripts
 ```bash
-    python solve_recapcha_demo.py
-    python solve_slide_capcha_demo.py
-    python docstudio_sign_demo.py
+    python -m solve_recapcha_demo
+    python -m solve_slide_capcha_demo
+    python -m docstudio_sign_demo
     
     python -m uefa.uefa_service
 ```

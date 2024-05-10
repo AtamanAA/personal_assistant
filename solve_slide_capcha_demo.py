@@ -31,8 +31,8 @@ class SlideCapchaSolveDemo:
     """
     def __init__(self, url: str = DEMO_URL):
         self.url = url
-        self.driver = ChromeBrowser(headless_mode=False).get_driver()  # for demo: headless_mode=False
-        # self.driver = ChromeBrowser(headless_mode=True).get_driver()
+        # self.driver = ChromeBrowser(headless_mode=False).get_driver()  # for demo: headless_mode=False
+        self.driver = ChromeBrowser(headless_mode=True).get_driver()
 
     def _get_url(self):
         print(f"Get url: {self.url}")
@@ -61,7 +61,7 @@ class SlideCapchaSolveDemo:
             except Exception as e:
                 print(f"Failed to delete {file_path}: {e}")
 
-        names = ['captcha.png', 'puzzle.png', 'original.png']
+        names = ['capcha.png', 'puzzle.png', 'original.png']
         for name, image_data in zip(names, images):
             image_data = image_data.replace('data:image/png;base64,', '')
             image_bytes = base64.b64decode(image_data)
@@ -96,7 +96,7 @@ class SlideCapchaSolveDemo:
     def _save_diff_image(self):
         # Load original and captcha images
         original_image = Image.open('./slide_capcha_img/original.png')
-        captcha_image = Image.open('./slide_capcha_img/captcha.png')
+        captcha_image = Image.open('./slide_capcha_img/capcha.png')
 
         # Get the size of the images
         width, height = original_image.size
@@ -268,7 +268,7 @@ class SlideCapchaSolveDemo:
 
         x_position = cx - initial_puzzle_position_x
         y_position = 0
-        print("Debug Initial mouse position:", x_position, y_position)
+        print("Debug position:", x_position, y_position)
 
         action = ActionChains(self.driver).move_to_element(slider_handle).click_and_hold()
         # action.move_by_offset(x_position, 20).release().perform()
@@ -283,9 +283,9 @@ class SlideCapchaSolveDemo:
         action.release().perform()
         time.sleep(3)
 
-        #TODO: Remove after debug
-        images_2 = self._get__slider_capcha_images()
-        self._save_images_for_second_step(images_2)
+        # #TODO: Remove after debug
+        # images_2 = self._get__slider_capcha_images()
+        # self._save_images_for_second_step(images_2)
 
     def _solve_captcha(self):
         print("Start Solve Capcha")
@@ -319,6 +319,8 @@ class SlideCapchaSolveDemo:
     def start_solve(self):
         self._get_url()
         self._solve_captcha()
+        time.sleep(5)
+        self.driver.save_screenshot("screenshots/success_solve_slide_capcha.png")
         time.sleep(5)
         self.driver.quit()
 
