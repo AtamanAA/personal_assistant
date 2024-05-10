@@ -53,6 +53,7 @@ class SlideCapchaSolveDemo:
 
     @staticmethod
     def _save_slider_capcha_images(images):
+        print("Start save capcha image")
         directory = f'{BASE_DIR}/slide_capcha_img/'
 
         # Create the directory if it doesn't exist
@@ -80,6 +81,7 @@ class SlideCapchaSolveDemo:
             # Save the new image
             with open(file_path, 'wb') as f:
                 f.write(image_bytes)
+                print(f"Save image to path: {file_path}")
         print("Save capcha images")
 
     @staticmethod
