@@ -65,6 +65,21 @@ class SlideCapchaSolve:
 
     @staticmethod
     def _save_slider_capcha_images(images):
+        print("Start save capcha image")
+        directory = f'{BASE_DIR}/slide_capcha_img/'
+
+        # Create the directory if it doesn't exist
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+
+        for filename in os.listdir(directory):
+            file_path = os.path.join(directory, filename)
+            try:
+                if os.path.isfile(file_path):
+                    os.unlink(file_path)
+            except Exception as e:
+                print(f"Failed to delete {file_path}: {e}")
+
         names = ['capcha.png', 'puzzle.png', 'original.png']
         for name, image_data in zip(names, images):
             image_data = image_data.replace('data:image/png;base64,', '')
