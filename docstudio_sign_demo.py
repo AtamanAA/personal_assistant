@@ -42,7 +42,11 @@ class DocStudioLoginDemo:
     def _go_to_waiting_for_you(self):
         print("Open 'Wating for you' folder")
         time.sleep(2)
-        waiting_for_you_filter = self.driver.find_element(By.CSS_SELECTOR, ".waiting")
+        # waiting_for_you_filter = self.driver.find_element(By.CSS_SELECTOR, ".waiting")
+        # waiting_for_you_filter.click()
+
+        wait = WebDriverWait(self.driver, 10)  # Adjust the timeout as needed
+        waiting_for_you_filter = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, ".waiting")))
         waiting_for_you_filter.click()
 
     def _open_first_document(self):
