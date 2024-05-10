@@ -280,15 +280,20 @@ class SlideCapchaSolveDemo:
 
         action = ActionChains(self.driver).move_to_element(slider_handle).click_and_hold()
         # action.move_by_offset(x_position, 20).release().perform()
+        print("Activated action")
 
         # action.move_by_offset(10, 0).move_by_offset(10, 0).move_by_offset(x_position - 20, 0).release().perform()
         action.move_by_offset(10, 5).perform()
         time.sleep(1)
+        print("Mouse move. Step 1")
         action.move_by_offset(10, 10).perform()
         time.sleep(1)
+        print("Mouse move. Step 2")
         action.move_by_offset(x_position - 20, 5).perform()
         time.sleep(1)
+        print("Mouse move. Step 3")
         action.release().perform()
+        print("Mouse release")
         time.sleep(3)
 
         # #TODO: Remove after debug
