@@ -52,15 +52,24 @@ class SlideCapchaSolveDemo:
 
     @staticmethod
     def _save_slider_capcha_images(images):
+        directory = './slide_capcha_img/'
+        for filename in os.listdir(directory):
+            file_path = os.path.join(directory, filename)
+            try:
+                if os.path.isfile(file_path):
+                    os.unlink(file_path)
+            except Exception as e:
+                print(f"Failed to delete {file_path}: {e}")
+
         names = ['captcha.png', 'puzzle.png', 'original.png']
         for name, image_data in zip(names, images):
             image_data = image_data.replace('data:image/png;base64,', '')
             image_bytes = base64.b64decode(image_data)
-            file_path = f'slide_capcha_img/{name}'
+            file_path = f'./slide_capcha_img/{name}'
 
-            # Remove existing file if it exists
-            if os.path.exists(file_path):
-                os.remove(file_path)
+            # # Remove existing file if it exists
+            # if os.path.exists(file_path):
+            #     os.remove(file_path)
 
             # Save the new image
             with open(file_path, 'wb') as f:
@@ -73,7 +82,7 @@ class SlideCapchaSolveDemo:
         for name, image_data in zip(names, images):
             image_data = image_data.replace('data:image/png;base64,', '')
             image_bytes = base64.b64decode(image_data)
-            file_path = f'slide_capcha_img/{name}'
+            file_path = f'./slide_capcha_img/{name}'
 
             # Remove existing file if it exists
             if os.path.exists(file_path):
@@ -86,8 +95,8 @@ class SlideCapchaSolveDemo:
 
     def _save_diff_image(self):
         # Load original and captcha images
-        original_image = Image.open('slide_capcha_img/original.png')
-        captcha_image = Image.open('slide_capcha_img/captcha.png')
+        original_image = Image.open('./slide_capcha_img/original.png')
+        captcha_image = Image.open('./slide_capcha_img/captcha.png')
 
         # Get the size of the images
         width, height = original_image.size
@@ -167,7 +176,7 @@ class SlideCapchaSolveDemo:
     def _find_puzzle_centre_position(self):
 
         # Load original and captcha images
-        original_image = Image.open('slide_capcha_img/puzzle.png')
+        original_image = Image.open('./slide_capcha_img/puzzle.png')
         # empty_image = Image.open('slide_capcha_img/puzzle.png')
 
         # Get the size of the images

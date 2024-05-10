@@ -5,6 +5,7 @@ from fake_useragent import UserAgent
 from selenium.webdriver.chrome.options import Options
 
 from custom_undetected_chromedriver import CustomUndetectedChromeDriver
+from variables import BASE_DIR
 
 
 class ChromeBrowser:
@@ -18,6 +19,20 @@ class ChromeBrowser:
         print(f"User-agent: {ua}")
         options.add_argument(f'--user-agent={ua}')
         options.add_argument("--window-size=800,600")
+        options.add_argument("--enable-javascript")
+
+        # TODO: add user-data-dir
+        # username = os.getenv("USERNAME")
+        # user_data_dir = os.path.join("C:\\Users", username, "AppData", "Local", "Google", "Chrome", "User Data",
+        #                              "Default")
+        # options.add_argument("user-data-dir={}".format(user_data_dir))
+
+        # options.add_argument('--allow-profiles-outside-user-dir')
+        # options.add_argument('--enable-profile-shortcut-manager')
+        # # options.add_argument(r'user-data-dir=.\User')
+        # options.add_argument(f"user-data-dir={os.path.join(BASE_DIR, 'User')}")
+        # options.add_argument('--profile-directory=Profile 1')
+
         if self.headless_mode:
             options.add_argument('--headless')  # headless mode
         self.driver = CustomUndetectedChromeDriver(version_main=int(self.__get_chrome_version), options=options,
