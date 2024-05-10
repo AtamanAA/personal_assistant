@@ -16,7 +16,7 @@ class DocStudioLoginDemo:
         self.doc_studio_email = DOC_STUDIO_EMAIL
         self.doc_studio_password = DOC_STUDIO_PASSWORD
         # self.driver = ChromeBrowser(headless_mode=False).get_driver()  # for demo: headless_mode=False
-        self.driver = ChromeBrowser(headless_mode=True).get_driver()  # for demo: headless_mode=False
+        self.driver = ChromeBrowser(headless=False).get_driver()
 
     def _get_url(self):
         print(f"Get url: {self.url}")

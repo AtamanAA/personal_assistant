@@ -10,8 +10,8 @@ from variables import BASE_DIR
 
 class ChromeBrowser:
 
-    def __init__(self, headless_mode: bool = True):
-        self.headless_mode = headless_mode
+    def __init__(self, headless: bool = False):
+        self.headless = headless
 
     def __set_up(self):
         options = Options()
@@ -33,14 +33,12 @@ class ChromeBrowser:
         # options.add_argument(f"user-data-dir={os.path.join(BASE_DIR, 'User')}")
         # options.add_argument('--profile-directory=Profile 1')
 
-        if self.headless_mode:
+        if self.headless:
             options.add_argument('--headless')  # headless mode
         version_main = int(self.__get_chrome_version)
         print(f"Browser version main: {version_main}")
         self.driver = CustomUndetectedChromeDriver(version_main=int(self.__get_chrome_version), options=options,
-                                                   headless=False)
-
-        # self.driver = CustomUndetectedChromeDriver(version_main=None, options=options, headless=False)
+                                                   headless=self.headless)
 
     @property
     def __get_chrome_version(self):

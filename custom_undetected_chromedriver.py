@@ -14,8 +14,11 @@ class CustomUndetectedChromeDriver(uc.Chrome):
     Class for fix OSError: [WinError 6] in undetected_chromedriver library
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, version_main=None, options=None, headless=False, **kwargs):
         super().__init__(**kwargs)
+        self.version_main = version_main
+        self.options = options
+        self.headless = headless
 
     def quit(self):
         try:
