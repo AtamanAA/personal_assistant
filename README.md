@@ -24,7 +24,7 @@
 
 ## Run demo scripts
 ```bash
-    python -m solve_recapcha_demo
+#    python -m solve_recapcha_demo
     python -m solve_slide_capcha_demo
     python -m docstudio_sign_demo
     
