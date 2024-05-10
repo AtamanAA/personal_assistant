@@ -15,7 +15,7 @@ class UserRegisterDemo:
     def __init__(self, url: str = DEMO_URL):
         self.url = url
         # self.driver = ChromeBrowser(headless_mode=False).get_driver()  # for demo: headless_mode=False
-        self.driver = ChromeBrowser(headless=False).get_driver()  # for demo: headless_mode=False
+        self.driver = ChromeBrowser(headless=True).get_driver()  # for demo: headless_mode=False
 
     def _get_url(self):
         print(f"Get url: {self.url}")

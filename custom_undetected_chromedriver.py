@@ -15,7 +15,7 @@ class CustomUndetectedChromeDriver(uc.Chrome):
     """
 
     def __init__(self, version_main=None, options=None, headless=False, **kwargs):
-        super().__init__(**kwargs)
+        super().__init__(version_main=version_main, options=options, headless=headless, **kwargs)
         self.version_main = version_main
         self.options = options
         self.headless = headless
