@@ -8,6 +8,7 @@ from custom_undetected_chromedriver import CustomUndetectedChromeDriver
 from variables import BASE_DIR
 
 
+
 class ChromeBrowser:
 
     def __init__(self, headless: bool = False):
@@ -19,8 +20,23 @@ class ChromeBrowser:
         print(f"User-agent: {ua}")
         options.add_argument(f'--user-agent={ua}')
         options.add_argument("--window-size=1920,1080")
+        options.add_argument("--start-maximized")
         options.add_argument("--enable-javascript")
         options.add_argument("--disable-blink-features=AutomationControlled")
+
+        # options.add_experimental_option("detach", True)
+        # options.add_experimental_option("excludeSwitches", ["enable-automation"])
+        # options.add_experimental_option('useAutomationExtension', False)
+        options.add_argument("--disable-blink-features=AutomationControlled")
+        options.add_argument('--disable-extensions')
+        options.add_argument('--no-sandbox')
+        options.add_argument('--disable-infobars')
+        options.add_argument('--disable-dev-shm-usage')
+        options.add_argument('--disable-browser-side-navigation')
+        options.add_argument('--disable-gpu')
+
+        # options.add_argument("user-data-dir='D:\ArtCode\ArtCode_projects\personal_assistant\personal_assistant'")
+        # options.add_argument('--proxy-server=http://216.173.80.126:6383')
 
 
         # TODO: add user-data-dir
@@ -35,14 +51,14 @@ class ChromeBrowser:
         # options.add_argument(f"user-data-dir={os.path.join(BASE_DIR, 'User')}")
         # options.add_argument('--profile-directory=Profile 1')
 
-        # if self.headless:
-        #     options.add_argument('--headless')  # headless mode
-        options.add_argument('–headless=new')
+        if self.headless:
+            # options.add_argument('--headless')  # headless mode
+            options.add_argument('–headless=new')
 
         version_main = int(self.__get_chrome_version)
         print(f"Browser version main: {version_main}")
         self.driver = CustomUndetectedChromeDriver(version_main=int(self.__get_chrome_version), options=options,
-                                                   headless=self.headless)
+                                                   headless=self.headless, use_subprocess=True)
         print("Set up driver")
 
     @property
