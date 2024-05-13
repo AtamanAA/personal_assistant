@@ -18,8 +18,10 @@ class ChromeBrowser:
         ua = UserAgent(platforms='pc').random
         print(f"User-agent: {ua}")
         options.add_argument(f'--user-agent={ua}')
-        options.add_argument("--window-size=1200,2000")
+        options.add_argument("--window-size=1920,1080")
         options.add_argument("--enable-javascript")
+        options.add_argument("--disable-blink-features=AutomationControlled")
+
 
         # TODO: add user-data-dir
         # username = os.getenv("USERNAME")
@@ -33,8 +35,8 @@ class ChromeBrowser:
         # options.add_argument(f"user-data-dir={os.path.join(BASE_DIR, 'User')}")
         # options.add_argument('--profile-directory=Profile 1')
 
-        if self.headless:
-            options.add_argument('--headless')  # headless mode
+        # if self.headless:
+        #     options.add_argument('--headless')  # headless mode
         version_main = int(self.__get_chrome_version)
         print(f"Browser version main: {version_main}")
         self.driver = CustomUndetectedChromeDriver(version_main=int(self.__get_chrome_version), options=options,
