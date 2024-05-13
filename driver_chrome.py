@@ -37,6 +37,8 @@ class ChromeBrowser:
 
         # if self.headless:
         #     options.add_argument('--headless')  # headless mode
+        options.add_argument('–headless=new')
+
         version_main = int(self.__get_chrome_version)
         print(f"Browser version main: {version_main}")
         self.driver = CustomUndetectedChromeDriver(version_main=int(self.__get_chrome_version), options=options,
