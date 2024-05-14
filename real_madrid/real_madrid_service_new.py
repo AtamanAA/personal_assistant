@@ -62,6 +62,11 @@ class RealMadridServiceNew:
         print(f"Title new tab after capcha: {capcha_tab.title}")
         capcha_tab.get_screenshot(path=f"{BASE_DIR}/screenshots", name='real_madrid_after_capcha.png', full_page=True)
         print("Open tickets tab")
+        check_text = capcha_tab.ele('.text-justify').text
+        if check_text:
+            print(f"Check text: {check_text}")
+        else:
+            print("Check text didn't find on page")
         return True
 
     def run(self):
