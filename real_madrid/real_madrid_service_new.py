@@ -1,6 +1,7 @@
 from DrissionPage import ChromiumPage, ChromiumOptions
 import time
 from variables import BASE_DIR
+from fake_useragent import UserAgent
 
 URL = "https://www.realmadrid.com/es-ES/entradas?filter-tickets=vip;general&filter-football=primer-equipo-masculino"
 
@@ -9,12 +10,18 @@ class RealMadridServiceNew:
     def __init__(self):
         self.login_url = URL
 
+        ua = UserAgent(platforms='pc').random
+        print(f"Set User-agent: {ua}")
+
         options = ChromiumOptions()
         options.headless(True)
+        options.set_user_agent(user_agent=ua)
+
         self.page = ChromiumPage(addr_or_opts=options)
 
     def _get_url(self, url: str):
         print(f"Get url: {url}")
+        print(f"User agent from page: {self.page.user_agent}")
         self.page.get(URL)
 
     def _login(self):
