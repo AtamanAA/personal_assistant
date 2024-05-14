@@ -62,16 +62,24 @@ class RealMadridServiceNew:
         print("Open tickets tab")
         print(f"Title new tab after capcha: {capcha_tab.title}")
         capcha_tab.get_screenshot(path=f"{BASE_DIR}/screenshots", name='real_madrid_after_capcha.png', full_page=True)
-        try:
-            capcha_tab.wait.ele_displayed('.item-title', timeout=60)
-            check_text = capcha_tab.ele('.item-title').text
-            if check_text:
-                print(f"Check text: {check_text}")
-            else:
-                print("Check text didn't find on page")
-            return True
-        except Exception as e:
-            print("Element with class='item-title' didn't find")
+        print(f"Tab check url: {capcha_tab.url}")
+        print(f"Tab check html: {capcha_tab.html[:1000]}")
+
+        # Open a file in write mode
+        with open(f"{BASE_DIR}/screenshots/check_real_madrid.html", "w") as file:
+            # Write the HTML content to the file
+            file.write(capcha_tab.html)
+
+        # try:
+            # capcha_tab.wait.ele_displayed('.item-title', timeout=60)
+            # check_text = capcha_tab.ele('.item-title').text
+        #     if check_text:
+        #         print(f"Check text: {check_text}")
+        #     else:
+        #         print("Check text didn't find on page")
+        #     return True
+        # except Exception as e:
+        #     print("Element with class='item-title' didn't find")
 
     def run(self):
         self._login()
