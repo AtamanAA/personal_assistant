@@ -29,6 +29,7 @@
     python -m docstudio_sign_demo
     
     python -m uefa.uefa_service
+    python -m real_madrid.real_madrid_service_new
 ```
 
 ## TODO:
