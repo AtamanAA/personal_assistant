@@ -58,11 +58,12 @@ class RealMadridServiceNew:
             checkbox.click()
             print("Click to capcha checkbox")
 
-        time.sleep(60)
+        time.sleep(30)
+        print("Open tickets tab")
         print(f"Title new tab after capcha: {capcha_tab.title}")
         capcha_tab.get_screenshot(path=f"{BASE_DIR}/screenshots", name='real_madrid_after_capcha.png', full_page=True)
-        print("Open tickets tab")
         try:
+            capcha_tab.wait.ele_displayed('.item-title', timeout=10)
             check_text = capcha_tab.ele('.item-title').text
             if check_text:
                 print(f"Check text: {check_text}")
@@ -70,7 +71,7 @@ class RealMadridServiceNew:
                 print("Check text didn't find on page")
             return True
         except Exception as e:
-            pass
+            print("Element with class='item-title' didn't find")
 
     def run(self):
         self._login()
