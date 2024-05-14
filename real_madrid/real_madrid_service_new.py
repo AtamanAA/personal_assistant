@@ -10,7 +10,7 @@ class RealMadridServiceNew:
         self.login_url = URL
 
         options = ChromiumOptions()
-        options.headless(False)
+        options.headless(True)
         self.page = ChromiumPage(addr_or_opts=options)
 
     def _get_url(self, url: str):
