@@ -12,7 +12,7 @@ from skimage.color import rgb2gray
 from skimage.feature import match_template
 from skimage.io import imread, imshow
 
-from variables import BASE_DIR
+from variables import BASE_DIR, DEBUG
 
 DEMO_URL = "https://www.geetest.com/en/demo"
 
@@ -71,7 +71,8 @@ class ImageSolve:
     def _find_puzzle_centre_position(self):
 
         # Load original and captcha images
-        original_image = Image.open(f'{BASE_DIR}/slide_capcha_img/puzzle.png')
+        # original_image = Image.open(f'{BASE_DIR}/slide_capcha_img/puzzle.png')
+        original_image = Image.open(self.puzzle_image_path)
         # empty_image = Image.open('slide_capcha_img/puzzle.png')
 
         # Get the size of the images
@@ -148,7 +149,7 @@ class ImageSolve:
         # Write the modified image back to diff.png
         cv2.imwrite(f'{BASE_DIR}/slide_capcha_img/puzzle_diff.png', src_image)
         print("FIND initial puzzle center")
-        return cx, cy
+        return cx
 
     @staticmethod
     def _crop_puzzle_image(image):
@@ -173,68 +174,79 @@ class ImageSolve:
     def _find_target_centre_position(self):
         # Load image
         # img = imread(f'{BASE_DIR}/slide_capcha_img/capcha.png')
-        img = imread(f'{BASE_DIR}/slide_capcha_img/capcha.png')[:, :, :3]  # Remove alpha channel
+        # img = imread(f'{BASE_DIR}/slide_capcha_img/capcha.png')[:, :, :3]  # Remove alpha channel
+        img = imread(self.capcha_image_path)[:, :, :3]  # Remove alpha channel
         img_gs = rgb2gray(img)
 
         # Plot
-        # fig, ax = plt.subplots(1, 2, figsize=(16, 8))
-        # ax[0].imshow(img)
-        # ax[0].set_title("Original Image of Where's Wally?")
-        # ax[0].set_axis_off()
-        # ax[1].imshow(img_gs, cmap='gray')
-        # ax[1].set_title("Grayscale Image of Where's Wally?")
-        # ax[1].set_axis_off()
-        # plt.show()
+        if DEBUG:
+            fig, ax = plt.subplots(1, 2, figsize=(16, 8))
+            ax[0].imshow(img)
+            ax[0].set_title("Original Image of Where's Wally?")
+            ax[0].set_axis_off()
+            ax[1].imshow(img_gs, cmap='gray')
+            ax[1].set_title("Grayscale Image of Where's Wally?")
+            ax[1].set_axis_off()
+            plt.show()
 
         # Get a template image and match it with the grayscale image
         # img_template = img_gs[100:120, 80:100]
 
-        img_template = imread(f'{BASE_DIR}/slide_capcha_img/puzzle.png')[:, :, :3]  # Remove alpha channel
+        # img_template = imread(f'{BASE_DIR}/slide_capcha_img/puzzle.png')[:, :, :3]  # Remove alpha channel
+        img_template = imread(self.puzzle_image_path)[:, :, :3]  # Remove alpha channel
         img_template_gs = rgb2gray(img_template)
 
         # img_template_gs = img_template_gs[13:73, 2:62]
 
         puzzle_image = imread(f'{BASE_DIR}/slide_capcha_img/puzzle.png')[:, :, :3]  # Remove alpha channel
+        puzzle_image = imread(self.puzzle_image_path)[:, :, :3]  # Remove alpha channel
         crop_img_template = self._crop_puzzle_image(image=puzzle_image)
 
         img_template_gs = rgb2gray(crop_img_template)
 
         # Plot
-        # fig, ax = plt.subplots(1, 2, figsize=(16, 8))
-        # # ax[0].imshow(img)
-        # # ax[0].set_title("puzzle_test")
-        # ax[0].set_axis_off()
-        # ax[1].imshow(img_template_gs, cmap='gray')
-        # ax[1].set_title("puzzle_test")
-        # ax[1].set_axis_off()
-        # plt.show()
+        if DEBUG:
+            fig, ax = plt.subplots(1, 2, figsize=(16, 8))
+            # ax[0].imshow(img)
+            # ax[0].set_title("puzzle_test")
+            ax[0].set_axis_off()
+            ax[1].imshow(img_template_gs, cmap='gray')
+            ax[1].set_title("puzzle_test")
+            ax[1].set_axis_off()
+            plt.show()
 
         result = match_template(img_gs, img_template_gs)
-        # fig, ax = plt.subplots(1, 1, figsize=(8, 8))
-        # ax.imshow(result, cmap='viridis')
-        # ax.set_title("Result of Template Matching")
-        # ax.set_axis_off()
-        # plt.show()
+
+        if DEBUG:
+            fig, ax = plt.subplots(1, 1, figsize=(8, 8))
+            ax.imshow(result, cmap='viridis')
+            ax.set_title("Result of Template Matching")
+            ax.set_axis_off()
+            plt.show()
 
         # Getting the max
         x, y = np.unravel_index(np.argmax(result), result.shape)
         imshow(img_gs)
         template_width, template_height = img_template_gs.shape
-        # rect = plt.Rectangle((y, x), template_height, template_width, color='red',
-        #                      fc='none')
-        # plt.gca().add_patch(rect)
-        # plt.title('Grayscale Image with Bounding Box around Wally')
-        # plt.axis('off')
-        # plt.show()
+        rect = plt.Rectangle((y, x), template_height, template_width, color='red',
+                             fc='none')
+        if DEBUG:
+            plt.gca().add_patch(rect)
+            plt.title('Grayscale Image with Bounding Box around Wally')
+            plt.axis('off')
+            plt.show()
 
         # Calculate centre rectangle
         cx = int(y + template_width / 2)
         cy = int(x + template_height / 2)
 
-        return cx, cy
+        return cx
 
     def find_puzzle_offset(self) -> int:
-        return 136
+        puzzle_centre_position = self._find_puzzle_centre_position()
+        target_centre_position = self._find_target_centre_position()
+        result = target_centre_position - puzzle_centre_position
+        return result
 
 
 if __name__ == '__main__':
