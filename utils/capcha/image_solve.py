@@ -1,7 +1,6 @@
 import base64
 import os
 import shutil
-import time
 
 import cv2
 import matplotlib.pyplot as plt
@@ -171,12 +170,37 @@ class ImageSolve:
 
         return cropped_img
 
+    def _find_puzzle_borders(self):
+        image = cv2.imread(self.puzzle_image_path, cv2.IMREAD_UNCHANGED)
+
+        # Remove alpha channel if present
+        if image.shape[2] == 4:
+            image = image[:, :, :3]
+
+        # Convert the image to RGB format for PIL
+        image_pil = Image.fromarray(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+
+        # Convert the image to grayscale
+        img_gray = image_pil.convert('L')
+
+        # Get the bounding box of the non-empty region
+        bbox = img_gray.getbbox()
+        if bbox:
+            # left, upper, right, lower = bbox
+            return bbox
+        return (0, 0, image.shape[1], image.shape[0])
+
+    def _find_puzzle_bottom_border(self):
+        return 100
+
     def _find_target_centre_position(self):
         # Load image
-        # img = imread(f'{BASE_DIR}/slide_capcha_img/capcha.png')
-        # img = imread(f'{BASE_DIR}/slide_capcha_img/capcha.png')[:, :, :3]  # Remove alpha channel
-        img = imread(self.capcha_image_path)[:, :, :3]  # Remove alpha channel
+        img = imread(self.capcha_image_path)
+        img = img[:, :, :3]  # Remove alpha channel
         img_gs = rgb2gray(img)
+
+        left, upper, right, lower = self._find_puzzle_borders()
+        img_gs = img_gs[upper - 5:lower + 5, :]  # Crop image by puzzle borders
 
         # Plot
         if DEBUG:
@@ -190,16 +214,8 @@ class ImageSolve:
             plt.show()
 
         # Get a template image and match it with the grayscale image
-        # img_template = img_gs[100:120, 80:100]
-
-        # img_template = imread(f'{BASE_DIR}/slide_capcha_img/puzzle.png')[:, :, :3]  # Remove alpha channel
-        img_template = imread(self.puzzle_image_path)[:, :, :3]  # Remove alpha channel
-        img_template_gs = rgb2gray(img_template)
-
-        # img_template_gs = img_template_gs[13:73, 2:62]
-
-        puzzle_image = imread(f'{BASE_DIR}/slide_capcha_img/puzzle.png')[:, :, :3]  # Remove alpha channel
-        puzzle_image = imread(self.puzzle_image_path)[:, :, :3]  # Remove alpha channel
+        puzzle_image = imread(self.puzzle_image_path)
+        puzzle_image = puzzle_image[:, :, :3]  # Remove alpha channel
         crop_img_template = self._crop_puzzle_image(image=puzzle_image)
 
         img_template_gs = rgb2gray(crop_img_template)
@@ -207,8 +223,6 @@ class ImageSolve:
         # Plot
         if DEBUG:
             fig, ax = plt.subplots(1, 2, figsize=(16, 8))
-            # ax[0].imshow(img)
-            # ax[0].set_title("puzzle_test")
             ax[0].set_axis_off()
             ax[1].imshow(img_template_gs, cmap='gray')
             ax[1].set_title("puzzle_test")
@@ -238,8 +252,6 @@ class ImageSolve:
 
         # Calculate centre rectangle
         cx = int(y + template_width / 2)
-        cy = int(x + template_height / 2)
-
         return cx
 
     def find_puzzle_offset(self) -> int:
@@ -251,8 +263,6 @@ class ImageSolve:
 
 if __name__ == '__main__':
     try:
-        # SlideCapchaSolve().start_solve()
-        # SlideCapchaSolve(driver=None, capcha_frame=None)._find_target_centre_position()
         puzzle_offset = ImageSolve(
             capcha_image_path=f"{BASE_DIR}/slide_capcha_img/capcha.png",
             puzzle_image_path=f"{BASE_DIR}/slide_capcha_img/puzzle.png").find_puzzle_offset()
