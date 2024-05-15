@@ -21,7 +21,7 @@ class UefaService:
         self.ticket_url = TICKET_URL
         self.user_email = UEFA_EMAIL
         self.user_password = UEFA_PASSWORD
-        self.driver = ChromeBrowser(headless=True).get_driver()  # for demo: headless_mode=False
+        self.driver = ChromeBrowser(headless=False).get_driver()  # for demo: headless_mode=False
 
     def _get_url(self, url: str):
         print(f"Get url: {url}")
