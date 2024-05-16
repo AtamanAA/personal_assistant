@@ -5,9 +5,9 @@ import shutil
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageDraw, ImageFilter
 from pixelmatch.contrib.PIL import pixelmatch
-from skimage.color import rgb2gray
+from skimage.color import rgb2gray, rgba2rgb, gray2rgb
 from skimage.feature import match_template
 from skimage.io import imread, imshow
 
@@ -202,14 +202,16 @@ class ImageSolve:
         left, upper, right, lower = self._find_puzzle_borders()
         img_gs = img_gs[upper - 5:lower + 5, :]  # Crop image by puzzle borders
 
+        # img_gs = img_gs[40:, :]  # Additional crop
+
         # Plot
         if DEBUG:
             fig, ax = plt.subplots(1, 2, figsize=(16, 8))
             ax[0].imshow(img)
-            ax[0].set_title("Original Image of Where's Wally?")
+            ax[0].set_title("Title")
             ax[0].set_axis_off()
             ax[1].imshow(img_gs, cmap='gray')
-            ax[1].set_title("Grayscale Image of Where's Wally?")
+            ax[1].set_title("Title")
             ax[1].set_axis_off()
             plt.show()
 
@@ -218,7 +220,35 @@ class ImageSolve:
         puzzle_image = puzzle_image[:, :, :3]  # Remove alpha channel
         crop_img_template = self._crop_puzzle_image(image=puzzle_image)
 
+        # # Convert crop_img_template to a NumPy array if it's a PIL Image
+        # if isinstance(crop_img_template, Image.Image):
+        #     crop_img_template = np.array(crop_img_template)
+        #
+        # # Convert crop_img_template to RGBA if it's not already
+        # if crop_img_template.shape[2] == 3:
+        #     crop_img_template = np.dstack([crop_img_template, np.ones_like(crop_img_template[:, :, 0]) * 255])
+        #
+        # # Get the dimensions of crop_img_template
+        # height, width, _ = crop_img_template.shape
+        #
+        # # Create a black image with 30% transparency
+        # black_image = np.zeros((height, width, 4), dtype=np.uint8)
+        # black_image[:, :, 3] = 255  # 76 = 30% of 255
+        #
+        # # Convert black_image to BGRA
+        # black_image = cv2.cvtColor(black_image, cv2.COLOR_BGR2BGRA)
+        #
+        # # Combine the images
+        # combined_image = cv2.addWeighted(black_image, 1, crop_img_template, 0.2, 0)
+        #
+        # cv2.imwrite(f"{BASE_DIR}/slide_capcha_img/combined_image.png", combined_image)
+
+        # Convert the combined image to grayscale
+        # img_template_gs = cv2.cvtColor(combined_image, cv2.COLOR_BGR2GRAY)
+
         img_template_gs = rgb2gray(crop_img_template)
+
+        # img_template_gs = img_template_gs[40:, :]  # Additional crop
 
         # Plot
         if DEBUG:
