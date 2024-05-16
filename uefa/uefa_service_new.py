@@ -50,31 +50,29 @@ class UefaServiceNew:
             if capcha_human_error:
                 print(f"Capcha human error:{capcha_human_error.text}")
             # Solve slide capcha
-            # slide_capcha_solver = SlideCapchaSolveNew(page=self.page, capcha_frame=iframe)
-            # slide_capcha_solver.solve_captcha()
+            slide_capcha_solver = SlideCapchaSolveNew(page=self.page, capcha_frame=iframe)
+            slide_capcha_solver.solve_captcha()
         else:
             print("Capcha frame didn't find")
 
         self.page.get_screenshot(path=f"{BASE_DIR}/screenshots", name='UEFA_after_capcha_page.png', full_page=True)
 
-        ac = Actions(self.page)
+        personal_account = self.page.wait.ele_displayed('#main_content_account_home_container', timeout=5)
+        if personal_account:
+            # TODO:
+            print("You are in you personal account!")
 
-        # TODO: Debug input data
-        # Input user data
-        self.page.ele('@type=email').input(self.user_email)
-        # email_input.input(self.user_email)
-        self.page.ele('@type=password').input(self.user_password)
-        # password_input.input(self.user_password)
+        else:
+            email = self.page.ele('xpath://*[@id="gigya-loginID-75579930407612940"]')
+            email.input(self.user_email)
+            password = self.page.ele('xpath://*[@id="gigya-password-32665041627364124"]')
+            password.input(self.user_password)
 
-        # submit_button = self.page.ele('.gigya-input-submit')
-        submit_button = self.page.ele('.gigya-composite-control-submit')
+            submit_button = self.page.ele('xpath://*[@id="gigya-login-form"]/div[4]/div/input')
+            submit_button.click()
 
-        ac.move_to(submit_button).click()
-        # submit_button.click()
-
-        time.sleep(10)
-
-        self.page.get_screenshot(path=f"{BASE_DIR}/screenshots", name='UEFA_after_login.png', full_page=True)
+            time.sleep(10)
+            self.page.get_screenshot(path=f"{BASE_DIR}/screenshots", name='UEFA_after_login.png', full_page=True)
 
     def run(self):
         self._login()
