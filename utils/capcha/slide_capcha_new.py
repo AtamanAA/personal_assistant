@@ -1,13 +1,8 @@
 import base64
 import time
 
-from selenium.webdriver.common.action_chains import ActionChains
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import WebDriverWait
-
+from utils.capcha.image_solve import ImageSolve
 from variables import BASE_DIR
-from personal_assistant.utils.capcha.image_solve import ImageSolve
 
 DEMO_URL = "https://www.geetest.com/en/demo"
 

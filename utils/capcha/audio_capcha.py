@@ -1,12 +1,7 @@
-import base64
-import time
 import os
-import requests
+import time
 
-from selenium.webdriver.common.action_chains import ActionChains
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import WebDriverWait
+import requests
 
 from variables import BASE_DIR
 from .audio_solve import AudioSolve
@@ -70,11 +65,11 @@ class AudioCapchaSolve:
         if len(numbers) == len(input_boxes):
 
             self.capcha_frame.ele(self.play_bottom_locator).click()
-            time.sleep(2)
+            time.sleep(5)
 
             for i in range(len(input_boxes)):
                 input_boxes[i].input(numbers[i])
-                time.sleep(1)
+                time.sleep(3)
             return True
 
         return None

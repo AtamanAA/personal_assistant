@@ -1,16 +1,10 @@
-from DrissionPage import ChromiumPage, ChromiumOptions
 import time
 
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import WebDriverWait
-
-from driver_chrome import ChromeBrowser
-from utils.capcha import SlideCapchaSolve
-from utils.capcha import SlideCapchaSolveNew, AudioCapchaSolve
-from variables import UEFA_EMAIL, UEFA_PASSWORD, BASE_DIR
+from DrissionPage import ChromiumPage, ChromiumOptions
 from fake_useragent import UserAgent
-from DrissionPage.common import Actions
+
+from utils.capcha.audio_capcha import AudioCapchaSolve
+from variables import UEFA_EMAIL, UEFA_PASSWORD, BASE_DIR
 
 LOGIN_URL = "https://euro2024-sales.tickets.uefa.com/account"
 TICKET_URL = "https://www.uefa.com/euro2024/ticketing/"
@@ -68,6 +62,10 @@ class UefaServiceNew:
                     break
                 iframe.ele('#captcha__reload__button').click()
                 continue
+
+        capcha_human_error = iframe.ele('.captcha__human')
+        if capcha_human_error:
+            print(f"Capcha human error:{capcha_human_error.text}")
 
         else:
             print("Capcha frame didn't find")
