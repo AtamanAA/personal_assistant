@@ -63,9 +63,9 @@ class UefaServiceNew:
                 iframe.ele('#captcha__reload__button').click()
                 continue
 
-        capcha_human_error = iframe.ele('.captcha__human')
-        if capcha_human_error:
-            print(f"Capcha human error:{capcha_human_error.text}")
+        # capcha_human_error = iframe.ele('.captcha__human')
+        # if capcha_human_error:
+        #     print(f"Capcha human error:{capcha_human_error.text}")
 
         else:
             print("Capcha frame didn't find")
