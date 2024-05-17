@@ -88,7 +88,7 @@ class SlideCapchaSolve:
         self.image_solver.save_slider_capcha_images(images)
         # cx, cy = self._find_target_centre_position()
 
-        cx = self.image_solver.find_puzzle_offset()
+        cx = self.image_solver.find_puzzle_offset_by_image_data()
 
         cy = 20
 

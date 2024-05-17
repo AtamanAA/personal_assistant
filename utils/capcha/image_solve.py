@@ -10,6 +10,9 @@ from pixelmatch.contrib.PIL import pixelmatch
 from skimage.color import rgb2gray, rgba2rgb, gray2rgb
 from skimage.feature import match_template
 from skimage.io import imread, imshow
+import imagehash
+from imagehash import ImageHash
+import json
 
 from variables import BASE_DIR, DEBUG
 
@@ -33,6 +36,8 @@ class ImageSolve:
     def __init__(self, capcha_image_path: str, puzzle_image_path: str):
         self.capcha_image_path = capcha_image_path
         self.puzzle_image_path = puzzle_image_path
+        self.slide_capcha_image_data_path = os.path.join(BASE_DIR, "utils/capcha/slide_image_data.json")
+        self.slide_capcha_image_data = self._get_slide_capcha_image_data()
 
     @staticmethod
     def save_slider_capcha_images(images: list) -> bool:
@@ -284,18 +289,82 @@ class ImageSolve:
         cx = int(y + template_width / 2)
         return cx
 
-    def find_puzzle_offset(self) -> int:
+    @staticmethod
+    def get_image_hash(image_path: str):
+        image_hash = imagehash.average_hash(Image.open(image_path))
+        return image_hash
+
+    def _get_slide_capcha_image_data(self):
+        file = open(self.slide_capcha_image_data_path)
+        data = json.load(file)
+        file.close()
+
+        image_data = {}
+        for image in data:
+            image_data[image["hash"]] = image["offset"]
+        return image_data
+
+    def _check_image_hash_in_slide_capcha_image_data(self, current_image_hash):
+        tolerance = 5
+        for key in self.slide_capcha_image_data.keys():
+            image_hash = self.hash_string_to_imagehash(key)
+            diff = abs(image_hash - current_image_hash)
+            if diff < tolerance:
+                return str(image_hash)
+        return None
+
+    # @staticmethod
+    # def hash_string_to_imagehash(hash_str):
+    #     # Convert the hex string to a numpy array of uint8
+    #     hash_array = [int(hash_str[i:i + 2], 16) for i in range(0, len(hash_str), 2)]
+    #     # Create an ImageHash instance
+    #     return ImageHash(np.array(hash_array, dtype=np.uint8))
+
+    @staticmethod
+    def hash_string_to_imagehash(hash_str):
+        # Ensure the hash string represents 64 bits (16 hexadecimal characters)
+        if len(hash_str) != 16:
+            raise ValueError("Hash string must be 16 hexadecimal characters representing 64 bits")
+
+        # Convert the hex string to a binary string
+        binary_str = bin(int(hash_str, 16))[2:].zfill(64)
+
+        # Convert the binary string to a list of integers
+        binary_array = np.array([int(bit) for bit in binary_str], dtype=np.uint8)
+
+        # Reshape the array to an 8x8 matrix
+        hash_matrix = binary_array.reshape((8, 8))
+
+        # Create and return an ImageHash instance
+        return ImageHash(hash_matrix)
+
+    def find_puzzle_offset_by_images(self) -> int:
+        """
+        Automatic calculate puzzle offset by capcha images
+        """
         puzzle_centre_position = self._find_puzzle_centre_position()
         target_centre_position = self._find_target_centre_position()
         result = target_centre_position - puzzle_centre_position
         return result
+
+    def find_puzzle_offset_by_image_data(self) -> int | None:
+        """
+        Find puzzle offset in images data
+        """
+        current_image_hash = self.get_image_hash(self.capcha_image_path)
+        check_hash = self._check_image_hash_in_slide_capcha_image_data(current_image_hash=current_image_hash)
+        if check_hash:
+            print(f"Find equal image with hash:{check_hash}")
+            result = self.slide_capcha_image_data.get(check_hash, None)
+            return result
+        return None
 
 
 if __name__ == '__main__':
     try:
         puzzle_offset = ImageSolve(
             capcha_image_path=f"{BASE_DIR}/slide_capcha_img/capcha.png",
-            puzzle_image_path=f"{BASE_DIR}/slide_capcha_img/puzzle.png").find_puzzle_offset()
+            puzzle_image_path=f"{BASE_DIR}/slide_capcha_img/puzzle.png").find_puzzle_offset_by_image_data()
         print(f"Puzzle offset: {puzzle_offset}")
     except Exception as error:
         print(error)

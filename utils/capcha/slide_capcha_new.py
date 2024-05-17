@@ -7,7 +7,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
 from variables import BASE_DIR
-from .image_solve import ImageSolve
+from personal_assistant.utils.capcha.image_solve import ImageSolve
 
 DEMO_URL = "https://www.geetest.com/en/demo"
 
@@ -64,15 +64,32 @@ class SlideCapchaSolveNew:
         slider_handle.drag(x_position, y_position, 2)
         print("Finish move slider")
 
-    def solve_captcha(self):
-        print("Start Solve Capcha")
+    def get_puzzle_offset(self):
         images = self._get__slider_capcha_images()
         print(f"Get {len(images)} capcha images")
 
         self.image_solver.save_slider_capcha_images(images)
-        cx = self.image_solver.find_puzzle_offset()
+        # result = self.image_solver.find_puzzle_offset_by_image_data()
+        result = self.image_solver.find_puzzle_offset_by_images()
+        return result
 
+    def solve_captcha(self):
+        print("Start Solve Capcha")
+        cx = self.get_puzzle_offset()
+        print(f"Puzzle offset: {cx}")
         self.move_slider(cx=cx)
+
+        # while True:
+        #     cx = self.get_puzzle_offset()
+        #     print(f"Puzzle offset: {cx}")
+        #     if cx:
+        #         self.move_slider(cx=cx)
+        #         break
+        #     # Refresh image
+        #     self.capcha_frame.ele('#captcha__reload__button').click()
+        #     print("Refresh images")
+        #     time.sleep(5)
+        #     continue
 
         print("Finish solve Capcha")
 
@@ -80,11 +97,6 @@ class SlideCapchaSolveNew:
     def save_image(data, filename):
         with open(filename, 'wb') as f:
             f.write(base64.b64decode(data))
-
-    def start_solve(self):
-        # self._get_url()
-        self.solve_captcha()
-        time.sleep(5)
 
 
 if __name__ == '__main__':

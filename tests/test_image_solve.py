@@ -25,7 +25,7 @@ class TestImageSolve:
                     actual_puzzle_offset = ImageSolve(
                         capcha_image_path=capcha_image_path,
                         puzzle_image_path=puzzle_image_path
-                    ).find_puzzle_offset()
+                    ).find_puzzle_offset_by_images()
                     actual_puzzle_move[image_folder] = actual_puzzle_offset
 
         diff = {}
