@@ -1,1 +1,1 @@
-from .capcha import ImageSolve, SlideCapchaSolve
+from .capcha import ImageSolve, SlideCapchaSolve, AudioSolve, AudioCapchaSolve

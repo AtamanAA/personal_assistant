@@ -7,7 +7,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 from driver_chrome import ChromeBrowser
 from utils.capcha import SlideCapchaSolve
-from utils.capcha import SlideCapchaSolveNew
+from utils.capcha import SlideCapchaSolveNew, AudioCapchaSolve
 from variables import UEFA_EMAIL, UEFA_PASSWORD, BASE_DIR
 from fake_useragent import UserAgent
 from DrissionPage.common import Actions
@@ -57,8 +57,18 @@ class UefaServiceNew:
             if capcha_human_error:
                 print(f"Capcha human error:{capcha_human_error.text}")
             # Solve slide capcha
-            slide_capcha_solver = SlideCapchaSolveNew(page=self.page, capcha_frame=iframe)
-            slide_capcha_solver.solve_captcha()
+            # slide_capcha_solver = SlideCapchaSolveNew(page=self.page, capcha_frame=iframe)
+            # slide_capcha_solver.solve_captcha()
+
+            # Solve audio capcha
+            while True:  # TODO: refactor
+                audio_capcha_solver = AudioCapchaSolve(page=self.page, capcha_frame=iframe)
+                solve_audio_capcha = audio_capcha_solver.solve_audio_capcha()
+                if solve_audio_capcha:
+                    break
+                iframe.ele('#captcha__reload__button').click()
+                continue
+
         else:
             print("Capcha frame didn't find")
 

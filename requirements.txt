@@ -49,3 +49,4 @@ wsproto==1.2.0
 DrissionPage
 pytest
 imagehash
+SpeechRecognition
