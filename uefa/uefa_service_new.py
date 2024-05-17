@@ -29,6 +29,10 @@ class UefaServiceNew:
         options = ChromiumOptions()
         options.headless(True)
         options.set_user_agent(user_agent=ua)
+        options.set_argument("--accept-lang=en-US")
+
+        # Disable all pop-up windows
+        # options.set_pref(arg='profile.default_content_settings.popups', value='0')
 
         self.page = ChromiumPage(addr_or_opts=options)
 
@@ -42,6 +46,9 @@ class UefaServiceNew:
         self._get_url(url=self.login_url)
         time.sleep(10)
         print("Open init URL")
+
+        check_languages = self.page.run_js('return navigator.languages')
+        print(f"Check languages: {check_languages}")
 
         # Find capcha iframe
         iframe = self.page.get_frame('@src^https://geo.captcha-delivery.com/captcha')
