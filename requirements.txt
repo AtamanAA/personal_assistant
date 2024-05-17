@@ -48,3 +48,4 @@ websockets==12.0
 wsproto==1.2.0
 DrissionPage
 pytest
+imagehash
