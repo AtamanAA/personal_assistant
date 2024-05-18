@@ -5,6 +5,7 @@ import requests
 
 from variables import BASE_DIR
 from .audio_solve import AudioSolve
+from DrissionPage.common import Actions
 
 
 class AudioCapchaSolve:
@@ -51,7 +52,10 @@ class AudioCapchaSolve:
             print("Audio file source not found.")
 
     def solve_audio_capcha(self):
-        self.capcha_frame.ele(self.audio_challenge_bottom_locator).click()
+        ac = Actions(self.capcha_frame)
+
+        audio_challenge_bottom = self.capcha_frame.ele(self.audio_challenge_bottom_locator)
+        ac.move_to(audio_challenge_bottom).click()
         time.sleep(2)
 
         self._save_audio_file()
@@ -62,13 +66,15 @@ class AudioCapchaSolve:
 
         input_boxes = self.capcha_frame.eles('.audio-captcha-inputs')
         print(f"Find {len(input_boxes)} input boxes")
+
         if len(numbers) == len(input_boxes):
-
             self.capcha_frame.ele(self.play_bottom_locator).click()
-            time.sleep(5)
-
+            time.sleep(4)
             for i in range(len(input_boxes)):
-                input_boxes[i].input(numbers[i])
+                input_box = input_boxes[i]
+                ac.move_to(input_box).click()
+
+                input_box.input(numbers[i])
                 time.sleep(3)
             return True
 
