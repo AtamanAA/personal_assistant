@@ -73,6 +73,9 @@ class UefaServiceNew:
         else:
             print("Capcha frame didn't find")
 
+        time.sleep(5)
+        print(f"Page title after solve capcha: {self.page.title}")
+
         self.page.get_screenshot(path=f"{BASE_DIR}/screenshots", name='UEFA_after_capcha_page.png', full_page=True)
 
         personal_account = self.page.wait.ele_displayed('#main_content_account_home_container', timeout=5)

@@ -59,7 +59,7 @@ class SlideCapchaSolveNew:
         x_position = cx
         y_position = random.randint(10, 20)  # Y offset only for emulate human beheiver
         print("Start move slider. Target offset:", x_position, y_position)
-        slider_handle.drag(x_position, y_position, duration=random.uniform(2, 4))
+        slider_handle.drag(x_position, y_position, duration=random.uniform(4, 6))
         print("Finish move slider")
 
     def get_puzzle_offset(self):
