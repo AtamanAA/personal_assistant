@@ -13,6 +13,7 @@ from skimage.io import imread, imshow
 import imagehash
 from imagehash import ImageHash
 import json
+import io
 
 from variables import BASE_DIR, DEBUG
 
@@ -36,6 +37,8 @@ class ImageSolve:
     def __init__(self, capcha_image_path: str, puzzle_image_path: str):
         self.capcha_image_path = capcha_image_path
         self.puzzle_image_path = puzzle_image_path
+        self.capcha_edge_path = f"{BASE_DIR}/slide_capcha_img/capcha_edge.png"
+        self.puzzle_edge_path = f"{BASE_DIR}/slide_capcha_img/puzzle_edge.png"
         self.slide_capcha_image_data_path = os.path.join(BASE_DIR, "utils/capcha/slide_image_data.json")
         self.slide_capcha_image_data = self._get_slide_capcha_image_data()
 
@@ -198,9 +201,54 @@ class ImageSolve:
     def _find_puzzle_bottom_border(self):
         return 100
 
+    def _read_image(self, image_source):
+        """
+        Read an image from a file or a requests response object.
+        """
+        if isinstance(image_source, bytes):
+            return cv2.imdecode(np.frombuffer(image_source, np.uint8), cv2.IMREAD_ANYCOLOR)
+        elif hasattr(image_source, 'read'):  # Checks if it's a file-like object
+            return cv2.imdecode(np.frombuffer(image_source.read(), np.uint8), cv2.IMREAD_ANYCOLOR)
+        else:
+            raise TypeError("Invalid image source type. Must be bytes or a file-like object.")
+
+    def _save_edge_image(self):
+
+        # Load the images using PIL
+        background_img_pil = Image.open(self.capcha_image_path)
+        puzzle_img_pil = Image.open(self.puzzle_image_path)
+
+        # Convert PIL images to bytes
+        background_bytes = io.BytesIO()
+        background_img_pil.save(background_bytes, format='PNG')
+        background_bytes = background_bytes.getvalue()
+
+        puzzle_bytes = io.BytesIO()
+        puzzle_img_pil.save(puzzle_bytes, format='PNG')
+        puzzle_bytes = puzzle_bytes.getvalue()
+
+        puzzle = self._read_image(puzzle_bytes)
+        capcha = self._read_image(background_bytes)
+
+        # Apply edge detection
+        edge_puzzle_piece = cv2.Canny(puzzle, 1000, 200)
+        edge_background = cv2.Canny(capcha, 200, 200)
+
+        cv2.imwrite(f'{BASE_DIR}/slide_capcha_img/edge_puzzle_piece.png', edge_puzzle_piece)
+        cv2.imwrite(f'{BASE_DIR}/slide_capcha_img//edge_background.png', edge_background)
+
+        # Convert to RGB for visualization
+        edge_puzzle_piece_rgb = cv2.cvtColor(edge_puzzle_piece, cv2.COLOR_GRAY2RGB)
+        edge_background_rgb = cv2.cvtColor(edge_background, cv2.COLOR_GRAY2RGB)
+
+        cv2.imwrite(self.puzzle_edge_path, edge_puzzle_piece_rgb)
+        cv2.imwrite(self.capcha_edge_path, edge_background_rgb)
+
     def _find_target_centre_position(self):
+
         # Load image
-        img = imread(self.capcha_image_path)
+        # img = imread(self.capcha_image_path)
+        img = imread(self.capcha_edge_path)
         img = img[:, :, :3]  # Remove alpha channel
         img_gs = rgb2gray(img)
 
@@ -221,7 +269,8 @@ class ImageSolve:
             plt.show()
 
         # Get a template image and match it with the grayscale image
-        puzzle_image = imread(self.puzzle_image_path)
+        # puzzle_image = imread(self.puzzle_image_path)
+        puzzle_image = imread(self.puzzle_edge_path)
         puzzle_image = puzzle_image[:, :, :3]  # Remove alpha channel
         crop_img_template = self._crop_puzzle_image(image=puzzle_image)
 
@@ -342,10 +391,12 @@ class ImageSolve:
         """
         Automatic calculate puzzle offset by capcha images
         """
+        self._save_edge_image()
         puzzle_centre_position = self._find_puzzle_centre_position()
         target_centre_position = self._find_target_centre_position()
         result = target_centre_position - puzzle_centre_position
-        return result
+        correct = 8
+        return result + correct
 
     def find_puzzle_offset_by_image_data(self) -> int | None:
         """
@@ -364,7 +415,7 @@ if __name__ == '__main__':
     try:
         puzzle_offset = ImageSolve(
             capcha_image_path=f"{BASE_DIR}/slide_capcha_img/capcha.png",
-            puzzle_image_path=f"{BASE_DIR}/slide_capcha_img/puzzle.png").find_puzzle_offset_by_image_data()
+            puzzle_image_path=f"{BASE_DIR}/slide_capcha_img/puzzle.png").find_puzzle_offset_by_images()
         print(f"Puzzle offset: {puzzle_offset}")
     except Exception as error:
         print(error)

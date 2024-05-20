@@ -4,7 +4,9 @@ from DrissionPage import ChromiumPage, ChromiumOptions
 from fake_useragent import UserAgent
 
 from utils.capcha.audio_capcha import AudioCapchaSolve
+from utils.capcha.slide_capcha_new import SlideCapchaSolveNew
 from variables import UEFA_EMAIL, UEFA_PASSWORD, BASE_DIR
+import random
 
 LOGIN_URL = "https://euro2024-sales.tickets.uefa.com/account"
 TICKET_URL = "https://www.uefa.com/euro2024/ticketing/"
@@ -38,7 +40,7 @@ class UefaServiceNew:
         print("Start login")
 
         self._get_url(url=self.login_url)
-        time.sleep(10)
+        time.sleep(random.uniform(8, 12))
         print("Open init URL")
 
         check_languages = self.page.run_js('return navigator.languages')
@@ -50,19 +52,20 @@ class UefaServiceNew:
             capcha_human_error = iframe.ele('.captcha__human')
             if capcha_human_error:
                 print(f"Capcha human error:{capcha_human_error.text}")
+
             # Solve slide capcha
-            # slide_capcha_solver = SlideCapchaSolveNew(page=self.page, capcha_frame=iframe)
-            # slide_capcha_solver.solve_captcha()
+            slide_capcha_solver = SlideCapchaSolveNew(page=self.page, capcha_frame=iframe)
+            slide_capcha_solver.solve_captcha()
 
             # Solve audio capcha
-            while True:  # TODO: refactor
-                audio_capcha_solver = AudioCapchaSolve(page=self.page, capcha_frame=iframe)
-                solve_audio_capcha = audio_capcha_solver.solve_audio_capcha()
-                if solve_audio_capcha:
-                    break
-                iframe.ele('#captcha__reload__button').click()
-                print("Reload audio challenge")
-                continue
+            # while True:  # TODO: refactor
+            #     audio_capcha_solver = AudioCapchaSolve(page=self.page, capcha_frame=iframe)
+            #     solve_audio_capcha = audio_capcha_solver.solve_audio_capcha()
+            #     if solve_audio_capcha:
+            #         break
+            #     iframe.ele('#captcha__reload__button').click()
+            #     print("Reload audio challenge")
+            #     continue
 
         # capcha_human_error = iframe.ele('.captcha__human')
         # if capcha_human_error:
@@ -86,12 +89,12 @@ class UefaServiceNew:
             submit_button = self.page.ele('xpath://*[@id="gigya-login-form"]/div[4]/div/input')
             submit_button.click()
 
-            time.sleep(10)
+            time.sleep(random.uniform(8, 12))
             self.page.get_screenshot(path=f"{BASE_DIR}/screenshots", name='UEFA_after_login.png', full_page=True)
 
     def run(self):
         self._login()
-        time.sleep(10)
+        time.sleep(random.uniform(8, 12))
         self.page.close()
         self.page.quit()
 

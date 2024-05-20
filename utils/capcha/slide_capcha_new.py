@@ -3,6 +3,8 @@ import time
 
 from utils.capcha.image_solve import ImageSolve
 from variables import BASE_DIR
+from DrissionPage.common import Actions
+import random
 
 DEMO_URL = "https://www.geetest.com/en/demo"
 
@@ -24,6 +26,7 @@ class SlideCapchaSolveNew:
     def __init__(self, page, capcha_frame):
         self.page = page
         self.capcha_frame = capcha_frame
+        self.puzzle_challenge_bottom_locator = "#captcha__puzzle__button"
 
         self.image_solver = ImageSolve(
             capcha_image_path=f"{BASE_DIR}/slide_capcha_img/capcha.png",
@@ -51,12 +54,12 @@ class SlideCapchaSolveNew:
 
     def move_slider(self, cx):
         print("Find slider handle")
-        time.sleep(3)
+        time.sleep(random.uniform(2, 5))
         slider_handle = self.capcha_frame.ele('.slider')
         x_position = cx
-        y_position = 10  # Fix y offset only for emulate human beheiver
+        y_position = random.randint(10, 20)  # Y offset only for emulate human beheiver
         print("Start move slider. Target offset:", x_position, y_position)
-        slider_handle.drag(x_position, y_position, 2)
+        slider_handle.drag(x_position, y_position, duration=random.uniform(2, 4))
         print("Finish move slider")
 
     def get_puzzle_offset(self):
@@ -70,6 +73,9 @@ class SlideCapchaSolveNew:
 
     def solve_captcha(self):
         print("Start Solve Capcha")
+        ac = Actions(self.capcha_frame)
+        puzzle_challenge_bottom = self.capcha_frame.ele(self.puzzle_challenge_bottom_locator)
+        ac.move_to(puzzle_challenge_bottom).click()
         cx = self.get_puzzle_offset()
         print(f"Puzzle offset: {cx}")
         self.move_slider(cx=cx)

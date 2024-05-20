@@ -7,7 +7,7 @@ from .data.puzzle_images.expect_puzzle_move import EXPECT_PUZZLE_MOVE
 class TestImageSolve:
 
     def test_find_puzzle_offset(self):
-        tolerance = 5
+        tolerance = 2
         image_data_dir = os.path.join(BASE_DIR, "tests/data/puzzle_images")
 
         actual_puzzle_move = {}
@@ -39,4 +39,4 @@ class TestImageSolve:
                 no_valid_count += 1
 
         effectiveness = int(((len(diff) - no_valid_count) / len(diff)) * 100)
-        assert effectiveness > 50
+        assert effectiveness >= 80
