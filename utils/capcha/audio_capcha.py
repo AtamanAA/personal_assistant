@@ -1,5 +1,6 @@
 import os
 import time
+import random
 
 import requests
 
@@ -52,11 +53,14 @@ class AudioCapchaSolve:
             print("Audio file source not found.")
 
     def solve_audio_capcha(self):
+        time.sleep(random.uniform(2, 4))
         ac = Actions(self.capcha_frame)
 
         audio_challenge_bottom = self.capcha_frame.ele(self.audio_challenge_bottom_locator)
         ac.move_to(audio_challenge_bottom).click()
-        time.sleep(2)
+        ac.move(300, 100, duration=2.2)
+        ac.move(200, 150, duration=1.3)
+        time.sleep(random.uniform(2, 4))
 
         self._save_audio_file()
 
@@ -68,14 +72,35 @@ class AudioCapchaSolve:
         print(f"Find {len(input_boxes)} input boxes")
 
         if len(numbers) == len(input_boxes):
-            self.capcha_frame.ele(self.play_bottom_locator).click()
-            time.sleep(4)
-            for i in range(len(input_boxes)):
-                input_box = input_boxes[i]
-                ac.move_to(input_box).click()
+            # TODO: find first input box position and move mouse to the centre this box
+            ac.move(300, 100)
+            ac.move(200, 150)
 
+            # TODO: find mouse init position, find play bottom position and move to centre this element
+            play_audio_bottom = self.capcha_frame.ele(self.play_bottom_locator)
+            ac.move_to(play_audio_bottom).wait(random.uniform(1, 2)).click()
+
+            time.sleep(random.uniform(4, 6))
+            # TODO: Debug and modification for human behavior
+            for i in range(len(input_boxes)):
+                input_box = self.capcha_frame.run_js("return document.activeElement")
+
+                ac.move_to(input_box, duration=random.uniform(0.5, 1.5)).wait(random.uniform(0.5, 1.5)).click()
+                time.sleep(random.uniform(0.2, 0.5))
+                # ac.move(random.randint(50, 100), random.randint(50, 100), duration=random.uniform(0.2, 0.5))
                 input_box.input(numbers[i])
-                time.sleep(3)
+
+                # js_script = f"""
+                #     (function(numbers) {{
+                #         let input_box = document.activeElement;
+                #         input_box.value = {numbers[i]};
+                #         let event = new Event('input', {{ bubbles: true }});
+                #         input_box.dispatchEvent(event);
+                #     }})(arguments[0]);
+                # """
+                # self.capcha_frame.run_js(js_script)
+                time.sleep(random.uniform(2.5, 3.5))
+
             return True
 
         return None

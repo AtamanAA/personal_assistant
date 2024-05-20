@@ -37,7 +37,7 @@ class AudioSolve:
         numbers = []
         for word in words:
             # If the word is a number, convert it to integer and append to the list
-            if word in word_to_number:
+            if word.lower() in word_to_number:
                 numbers.append(word_to_number[word])
         return numbers
 
