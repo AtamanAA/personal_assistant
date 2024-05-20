@@ -31,6 +31,8 @@
     
     python -m uefa.uefa_service_new
     python -m real_madrid.real_madrid_service_new
+    
+    python -m uefa.uefa_service_stealth
 ```
 
 ## TODO:
