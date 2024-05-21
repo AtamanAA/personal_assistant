@@ -18,6 +18,7 @@ class RealMadridServiceNew:
         options.headless(True)
         options.set_user_agent(user_agent=ua)
         options.set_argument("--accept-lang=en-US")
+        options.set_address("localhost:8080")
 
         self.page = ChromiumPage(addr_or_opts=options)
 

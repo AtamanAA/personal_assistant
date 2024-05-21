@@ -1,3 +1,4 @@
+import os
 import time
 
 from DrissionPage import ChromiumPage, ChromiumOptions
@@ -7,6 +8,65 @@ from utils.capcha.audio_capcha import AudioCapchaSolve
 from utils.capcha.slide_capcha_new import SlideCapchaSolveNew
 from variables import UEFA_EMAIL, UEFA_PASSWORD, BASE_DIR
 import random
+
+# PROXY_HOST = "f-9933.sp5.ovh"  # rotating proxy or host
+# PROXY_HOST = "127.0.0.1"  # rotating proxy or host
+# PROXY_PORT = "8000"  # port
+# PROXY_USER = ''  # username
+# PROXY_PASS = ''  # password
+#
+#
+# manifest_json = """
+# {
+#     "version": "1.0.0",
+#     "manifest_version": 2,
+#     "name": "Chrome Proxy",
+#     "permissions": [
+#         "proxy",
+#         "tabs",
+#         "unlimitedStorage",
+#         "storage",
+#         "<all_urls>",
+#         "webRequest",
+#         "webRequestBlocking"
+#     ],
+#     "background": {
+#         "scripts": ["background.js"]
+#     },
+#     "minimum_chrome_version":"22.0.0"
+# }
+# """
+#
+# background_js = f"""
+# var config = {{
+#         mode: "fixed_servers",
+#         rules: {{
+#         singleProxy: {{
+#             scheme: "http",
+#             host: "{PROXY_HOST}",
+#             port: parseInt("{PROXY_PORT}")
+#         }},
+#         bypassList: ["localhost", "127.0.0.1"]
+#         }}
+#     }};
+#
+# chrome.proxy.settings.set({{value: config, scope: "regular"}}, function() {{}});
+#
+# function callbackFn(details) {{
+#     return {{
+#         authCredentials: {{
+#             username: "{PROXY_USER}",
+#             password: "{PROXY_PASS}"
+#         }}
+#     }};
+# }}
+#
+# chrome.webRequest.onAuthRequired.addListener(
+#             callbackFn,
+#             {{urls: ["<all_urls>"]}},
+#             ['blocking']
+# );
+# """
 
 LOGIN_URL = "https://euro2024-sales.tickets.uefa.com/account"
 TICKET_URL = "https://www.uefa.com/euro2024/ticketing/"
@@ -27,10 +87,26 @@ class UefaServiceNew:
         options.set_user_agent(user_agent=ua)
         options.set_argument("--accept-lang=en-US")
 
+        options.set_address("localhost:8080")
+
         # Disable all pop-up windows
         # options.set_pref(arg='profile.default_content_settings.popups', value='0')
 
+        # plugin_dir = 'proxy_auth_plugin'
+        # # Create plugin directory if it doesn't exist
+        # if not os.path.exists(plugin_dir):
+        #     os.makedirs(plugin_dir)
+        # # Write manifest.json and background.js to the plugin directory
+        # with open(os.path.join(plugin_dir, "manifest.json"), 'w') as f:
+        #     f.write(manifest_json)
+        # with open(os.path.join(plugin_dir, "background.js"), 'w') as f:
+        #     f.write(background_js)
+        #
+        # options.add_extension(plugin_dir)
+        # options.remove_extensions()
+
         self.page = ChromiumPage(addr_or_opts=options)
+        self.page.clear_cache(cookies=True)
 
     def _get_url(self, url: str):
         print(f"Get url: {url}")
@@ -42,6 +118,8 @@ class UefaServiceNew:
         self._get_url(url=self.login_url)
         time.sleep(random.uniform(8, 12))
         print("Open init URL")
+
+        cookies = self.page.cookies()
 
         check_languages = self.page.run_js('return navigator.languages')
         print(f"Check languages: {check_languages}")
