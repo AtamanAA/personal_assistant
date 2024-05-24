@@ -78,6 +78,7 @@ class UefaServiceNew:
         self.ticket_url = TICKET_URL
         self.user_email = UEFA_EMAIL
         self.user_password = UEFA_PASSWORD
+        self.cursor_debug = False
 
         ua = UserAgent(platforms='pc').random
         print(f"Set User-agent: {ua}")
@@ -85,9 +86,15 @@ class UefaServiceNew:
         options = ChromiumOptions()
         options.headless(True)
         options.set_user_agent(user_agent=ua)
-        options.set_argument("--accept-lang=en-US")
+        options.set_argument("--accept-lang=en-US,uk;q=0.9")
 
         options.set_address("localhost:8080")
+
+        # options.set_argument("--start-maximized")
+        # options.set_argument("--disable-blink-features=AutomationControlled")
+        # options.set_argument("--incognito")
+        #
+        # options.remove_argument("'--disable-popup-blocking'")
 
         # Disable all pop-up windows
         # options.set_pref(arg='profile.default_content_settings.popups', value='0')
@@ -106,7 +113,7 @@ class UefaServiceNew:
         # options.remove_extensions()
 
         self.page = ChromiumPage(addr_or_opts=options)
-        self.page.clear_cache(cookies=True)
+        # self.page.clear_cache(cookies=True)  # For debug only
 
     def _get_url(self, url: str):
         print(f"Get url: {url}")
@@ -123,6 +130,9 @@ class UefaServiceNew:
 
         check_languages = self.page.run_js('return navigator.languages')
         print(f"Check languages: {check_languages}")
+
+        if self.cursor_debug:
+            self.__check_mouse_actions()
 
         # Find capcha iframe
         iframe = self.page.get_frame('@src^https://geo.captcha-delivery.com/captcha')
@@ -172,6 +182,63 @@ class UefaServiceNew:
 
             time.sleep(random.uniform(8, 12))
             self.page.get_screenshot(path=f"{BASE_DIR}/screenshots", name='UEFA_after_login.png', full_page=True)
+
+    def __check_mouse_actions(self):
+        # HTML string to add
+        html_string = (
+            '<div id="graph" style="position: fixed; top: 0; left: 0; z-index: 9999; background: rgba(255, 255, 255, 0.8); padding: 10px; border: 1px solid black;">'
+            '<p>Move your mouse to see its position.</p>'
+            '<p id="screen-log"></p>'
+            '<canvas id="canvas" width="2550" height="1440" style="border: 1px solid black;"></canvas>'
+            '</div>'
+        )
+
+        # JavaScript to add
+        script_content = """
+        window.onclick = function(event) {
+            console.log(event);
+        }
+
+        let screenLog = document.querySelector("#screen-log");
+        let canvas = document.querySelector("#canvas");
+        let ctx = canvas.getContext("2d");
+        let lastX, lastY;
+
+        canvas.addEventListener("mousemove", logAndDraw);
+
+        function logAndDraw(e) {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            screenLog.innerText = `
+                Canvas X/Y: ${x}, ${y}
+                Client X/Y: ${e.clientX}, ${e.clientY}`;
+
+            if (lastX !== undefined && lastY !== undefined) {
+                ctx.beginPath();
+                ctx.moveTo(lastX, lastY);
+                ctx.lineTo(x, y);
+                ctx.stroke();
+            }
+
+            lastX = x;
+            lastY = y;
+        }
+
+        setInterval(() => {
+            if (lastX !== undefined && lastY !== undefined) {
+                let now = new Date();
+                console.log(`Coordinates: (${lastX}, ${lastY}) at ${now.toLocaleTimeString()}`);
+            }
+        }, 500);
+        """
+
+        # Adding the HTML content to the page
+        self.page.add_ele(html_or_info=html_string)
+
+        # Running the script content
+        self.page.run_js(script_content)
 
     def run(self):
         self._login()
