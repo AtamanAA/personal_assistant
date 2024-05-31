@@ -14,3 +14,6 @@ DOC_STUDIO_PASSWORD = os.getenv("DOC_STUDIO_PASSWORD", "test_password")
 
 UEFA_EMAIL = os.getenv("UEFA_EMAIL", "uefa_example_email@gmail.com")
 UEFA_PASSWORD = os.getenv("UEFA_PASSWORD", "uefa_example_password")
+
+API_KEY_2CAPCHA = os.getenv("API_KEY_2CAPCHA", "")
+API_KEY_EZCAPTCHA = os.getenv("API_KEY_EZCAPTCHA", "")
