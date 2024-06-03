@@ -5,8 +5,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
-from custom_recapcha_solver import CustomRecaptchaSolver
-from driver_chrome import ChromeBrowser
+from utils.capcha.custom_recapcha_solver import CustomRecaptchaSolver
+from utils.chrome_driver.driver_chrome import ChromeBrowser
 
 DEMO_URL = "https://www.google.com/recaptcha/api2/demo"
 

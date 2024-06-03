@@ -88,7 +88,7 @@ class UefaServiceNew:
         options.set_user_agent(user_agent=ua)
         options.set_argument("--accept-lang=en-US,uk;q=0.9")
 
-        options.set_address("localhost:8080")
+        options.set_address("localhost:9090")
 
         # options.set_argument("--start-maximized")
         # options.set_argument("--disable-blink-features=AutomationControlled")

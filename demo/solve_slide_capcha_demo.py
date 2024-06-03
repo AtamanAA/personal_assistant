@@ -12,7 +12,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from variables import BASE_DIR
 
-from driver_chrome import ChromeBrowser
+from utils.chrome_driver.driver_chrome import ChromeBrowser
 
 DEMO_URL = "https://www.geetest.com/en/demo"
 

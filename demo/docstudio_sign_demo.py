@@ -4,7 +4,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
-from driver_chrome import ChromeBrowser
+from utils.chrome_driver.driver_chrome import ChromeBrowser
 from variables import DOC_STUDIO_EMAIL, DOC_STUDIO_PASSWORD
 
 DEMO_URL = "https://app.docstudio.com/auth/login"
