@@ -33,6 +33,11 @@
 #    python -m cloud_capcha_demo
 ```
 
+## API
+```bash
+  uvicorn main:app --port 8003
+```
+
 ## TODO:
 * use proxy server for reCapcha
 * Calculate the requests limit per hour to get the maximum chance of passing the reCapcha

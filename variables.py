@@ -17,3 +17,5 @@ UEFA_PASSWORD = os.getenv("UEFA_PASSWORD", "uefa_example_password")
 
 API_KEY_2CAPCHA = os.getenv("API_KEY_2CAPCHA", "")
 API_KEY_EZCAPTCHA = os.getenv("API_KEY_EZCAPTCHA", "")
+
+PROXY_PASSWORD = os.getenv("PROXY_PASSWORD", "")

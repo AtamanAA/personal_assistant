@@ -12,7 +12,7 @@ def get_proxies_list():
 
 
 def check_proxy_list(proxy_list: list):
-    for proxy in proxy_list[3:4]:
+    for proxy in proxy_list:
         try:
             proxies = {
                 "http": f'http://{proxy["username"]}:{proxy["password"]}@{proxy["ip"]}:{proxy["port"]}',
@@ -22,7 +22,7 @@ def check_proxy_list(proxy_list: list):
             ip_check_response = requests.get('https://httpbin.org/ip', proxies=proxies)
             ip_check = ip_check_response.json()
             print(ip_check)
-            time.sleep(3)
+            time.sleep(10)
         except Exception as error:
             print(error)
 
