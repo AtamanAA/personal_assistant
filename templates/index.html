@@ -1,11 +1,18 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Tickets</title>
-</head>
-<body>
-    <h1><a href="{{ url_for('get_uefa') }}">UEFA</a></h1>
-    <h1><a href="#">Real Madrid</a></h1>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block title %}Tickets{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h1>Tickets home page</h1>
+      <div class="row">
+          <div class="col-md-4">
+            <img class="img-fluid" src="//static.captcha-delivery.com/captcha/assets/set/7a559f5787f5a306bd2d9a9ddf4746cb3681e1f9/logo.png?update_cache=8581571820021236972">
+          </div>
+          <div class="col-md-4">
+            <img class="img-fluid" src="https://logos-world.net/wp-content/uploads/2020/06/Real-Madrid-Logo.png">
+          </div>
+      </div>
+    </div>
+
+{% endblock %}

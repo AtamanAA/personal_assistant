@@ -1,33 +1,55 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>UEFA</title>
-</head>
-<body>
-    <h1>UEFA Page</h1>
-    <h2>Available session: {{ available_session }}</h2>
-    <form action="{{ url_for('add_session_form') }}" method="post">
-        <label for="proxy_user">Proxy User:</label><br>
-        <input type="text" id="proxy_user" name="proxy_user"><br>
-        <label for="proxy_host">Proxy Host:</label><br>
-        <input type="text" id="proxy_host" name="proxy_host"><br>
-        <label for="proxy_port">Proxy Port:</label><br>
-        <input type="text" id="proxy_port" name="proxy_port"><br>
-        <label for="ip">IP Address:</label><br>
-        <input type="text" id="ip" name="ip"><br>
-        <label for="data_dome_cookie">Data Dome Cookie:</label><br>
-        <input type="text" id="data_dome_cookie" name="data_dome_cookie"><br><br>
-        <input type="submit" value="Add Session">
-    </form>
+{% extends "base.html" %}
 
-    <form action="{{ url_for('run_uefa_script_form') }}" method="post">
-        <label for="email">UEFA User email:</label><br>
-        <input type="email" id="uefa_user_email" name="email"><br>
-        <label for="password">UEFA User password:</label><br>
-        <input type="password" id="uefa_user_password" name="password"><br>
+{% block title %}UEFA{% endblock %}
 
-        <input type="submit" value="Run uefa script">
-    </form>
-</body>
-</html>
+{% block content %}
+
+    <div class="container">
+        <h1>UEFA Page</h1>
+      <div class="row">
+        <div class="col-md-4">
+            <h2>New sessions info</h2>
+
+            <form action="{{ url_for('add_session_form') }}" method="post">
+                <label for="proxy_user" class="form-label mb-0">Proxy User:</label><br>
+                <input type="text" id="proxy_user" name="proxy_user" class="form-control"><br>
+                <label for="proxy_host" class="form-label mb-0">Proxy Host:</label><br>
+                <input type="text" id="proxy_host" name="proxy_host" class="form-control"><br>
+                <label for="proxy_port" class="form-label mb-0">Proxy Port:</label><br>
+                <input type="text" id="proxy_port" name="proxy_port" class="form-control"><br>
+                <label for="ip" class="form-label mb-0">IP Address:</label><br>
+                <input type="text" id="ip" name="ip" class="form-control"><br>
+                <label for="data_dome_cookie" class="form-label mb-0">Data Dome Cookie:</label><br>
+                <input type="text" id="data_dome_cookie" name="data_dome_cookie" class="form-control"><br><br>
+                <input type="submit" class="btn btn-secondary" value="Add new session">
+            </form>
+        </div>
+        <div class="col-md-4">
+            <h2>Script settings</h2>
+            <form action="{{ url_for('run_uefa_script_form') }}" method="post">
+                <label for="email" class="form-labe mb-0l">UEFA User email:</label><br>
+                <input type="email" id="uefa_user_email" name="email" class="form-control" placeholder="name@example.com"><br>
+                <label for="password" class="form-label mb-0">UEFA User password:</label><br>
+                <input type="password" id="uefa_user_password" name="password" class="form-control"><br>
+                <input type="submit" class="btn btn-success" value="Run uefa script">
+                <hr>
+                <div>
+                    <h3>Current session status</h3>
+                    <p>TODO: update by JS (one time per X seconds)</p>
+                </div>
+                <hr>
+                <div>
+                    <h3>The last screenshot</h3>
+                    <p>TODO: update by JS (one time per X seconds)</p>
+                </div>
+
+            </form>
+        </div>
+        <div class="col-md-4">
+            <h2>Additional info</h2>
+            <h3>Available session: {{ available_session }}</h3>
+
+        </div>
+      </div>
+    </div>
+{% endblock %}
