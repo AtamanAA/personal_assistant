@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>UEFA</title>
+</head>
+<body>
+    <h1>UEFA Page</h1>
+    <h2>Available session: {{ available_session }}</h2>
+    <form action="{{ url_for('add_session_form') }}" method="post">
+        <label for="proxy_user">Proxy User:</label><br>
+        <input type="text" id="proxy_user" name="proxy_user"><br>
+        <label for="proxy_host">Proxy Host:</label><br>
+        <input type="text" id="proxy_host" name="proxy_host"><br>
+        <label for="proxy_port">Proxy Port:</label><br>
+        <input type="text" id="proxy_port" name="proxy_port"><br>
+        <label for="ip">IP Address:</label><br>
+        <input type="text" id="ip" name="ip"><br>
+        <label for="data_dome_cookie">Data Dome Cookie:</label><br>
+        <input type="text" id="data_dome_cookie" name="data_dome_cookie"><br><br>
+        <input type="submit" value="Add Session">
+    </form>
+
+    <form action="{{ url_for('run_uefa_script_form') }}" method="post">
+        <label for="email">UEFA User email:</label><br>
+        <input type="email" id="uefa_user_email" name="email"><br>
+        <label for="password">UEFA User password:</label><br>
+        <input type="password" id="uefa_user_password" name="password"><br>
+
+        <input type="submit" value="Run uefa script">
+    </form>
+</body>
+</html>

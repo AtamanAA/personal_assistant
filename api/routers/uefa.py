@@ -4,8 +4,11 @@ import uuid
 from datetime import datetime, timedelta
 from typing import List
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request, Form
+from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field
+from fastapi.templating import Jinja2Templates
+from fastapi.responses import RedirectResponse
 
 from variables import BASE_DIR
 from services.uefa import UefaService
@@ -16,6 +19,8 @@ SESSION_EXPIRE_TIME = 30
 
 tag = "UEFA"
 router = APIRouter(prefix="/uefa", tags=[tag])
+
+templates = Jinja2Templates(directory="templates")
 
 
 class Proxy(BaseModel):
@@ -86,6 +91,32 @@ def add_session(new_session: SessionBase):
     return new_session
 
 
+@router.post("/sessions_form", response_model=Session)
+def add_session_form(
+        proxy_user: str = Form(...),
+        proxy_host: str = Form(...),
+        proxy_port: str = Form(...),
+        ip: str = Form(...),
+        data_dome_cookie: str = Form(...)
+):
+    """
+    Add a new session for UEFA
+    """
+    proxy = Proxy(user=proxy_user, host=proxy_host, port=proxy_port)
+    new_session = SessionBase(proxy=proxy, ip=ip, data_dome_cookie=data_dome_cookie)
+
+    with open(UEFA_SESSION_PATH, 'r') as file:
+        sessions_content = file.read()
+    sessions = json.loads(sessions_content)
+
+    sessions.append(Session(**new_session.dict()).dict())
+
+    with open(UEFA_SESSION_PATH, 'w') as file:
+        file.write(json.dumps(sessions, default=str, indent=4))
+
+    return RedirectResponse(url="/uefa", status_code=303)
+
+
 @router.get("/available_sessions", response_model=List[Session])
 def get_available_sessions():
     """
@@ -127,4 +158,34 @@ def run_uefa_script(user_info: UserUEFA):
     raise HTTPException(detail="Use all available sessions", status_code=404)
 
 
+@router.post("/run_uefa_script_form",
+             # response_model=Session
+             )
+def run_uefa_script_form(email: str = Form(...), password: str = Form(...)):
+    """
+    Run UEFA script
+    """
+    available_session = get_uefa_available_session()
 
+    if not available_session:
+        raise HTTPException(detail="Available session didn't find", status_code=404)
+
+    for session in available_session:
+        session_ip = session["ip"]
+        check_proxy_ip = get_proxy_ip(proxy=session["proxy"])
+        print(f"Session IP    : {session_ip}")
+        print(f"Check proxy IP: {check_proxy_ip}")
+        if session_ip != check_proxy_ip:
+            time.sleep(5)
+            continue
+        UefaService(
+            proxy_user=session["proxy"]["user"],
+            proxy_host=session["proxy"]["host"],
+            proxy_port=session["proxy"]["port"],
+            data_dome_cookie=session["data_dome_cookie"],
+            user_email=email,
+            user_password=password
+        ).run()
+        return RedirectResponse(url="/uefa", status_code=303)  # TODO: Add error exceptions
+
+    raise HTTPException(detail="Use all available sessions", status_code=404)
