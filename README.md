@@ -35,7 +35,7 @@
 
 ## API
 ```bash
-  uvicorn main:app --port 8003
+  uvicorn main:app --host 0.0.0.0 --port 8004
 ```
 
 ## TODO:
