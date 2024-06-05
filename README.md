@@ -22,6 +22,14 @@
 
 ```
 
+### Available commands for user assistant
+```bash
+systemctl restart personal_assistant
+systemctl stop personal_assistant
+systemctl start personal_assistant
+systemctl status personal_assistant
+```
+
 ## Run demo scripts
 ```bash
     python -m uefa.uefa_service
