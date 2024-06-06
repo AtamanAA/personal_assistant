@@ -2,9 +2,14 @@ import random
 import time
 
 from DrissionPage import ChromiumPage, ChromiumOptions
+from loguru import logger
 
 from utils import create_proxy_auth_plugin
 from variables import UEFA_EMAIL, UEFA_PASSWORD, BASE_DIR
+
+
+log_file_path = "logs/uefa_logs.json"
+logger.add(log_file_path, format="{time} {level} {message}", rotation="1 MB", serialize=True)
 
 LOGIN_URL = "https://euro2024-sales.tickets.uefa.com/account"
 TICKET_URL = "https://www.uefa.com/euro2024/ticketing/"
@@ -26,7 +31,7 @@ class UefaService:
         # self.user_agent = UserAgent(platforms='pc').random
         self.user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36'
 
-        print(f"Set User-agent: {self.user_agent}")
+        logger.debug(f"Set User-agent: {self.user_agent}")
 
         options = ChromiumOptions()
         options.headless(True)
@@ -44,18 +49,17 @@ class UefaService:
         self.page.clear_cache(cookies=True)  # For debug only
 
     def _get_url(self, url: str):
-        print(f"Get url: {url}")
+        logger.info(f"Get url: {url}")
         self.page.get(url)
 
     def _login(self):
-        print("Start login")
+        logger.info("Start login")
 
         self._get_url(url=self.login_url)
         time.sleep(random.uniform(8, 12))
-        print("Open init URL")
 
         check_cookies = self.page.cookies()
-        print(f"Check cookie:{check_cookies}")
+        logger.debug(f"Check cookie:{check_cookies}")
 
         updated_cookies = [
             {'name': 'datadome', 'value': self.data_dome_cookie, 'domain': '.uefa.com', 'max-age': "31536000",
@@ -65,43 +69,43 @@ class UefaService:
         self.page.set.cookies(cookies=updated_cookies)
 
         check_cookies = self.page.cookies()
-        print(f"Updated cookie:{check_cookies}")
+        logger.debug(f"Updated cookie:{check_cookies}")
         time.sleep(random.uniform(8, 12))
 
         self.page.refresh()
         time.sleep(random.uniform(8, 12))
-        print("Refresh page after update cookies")
+        logger.info("Refresh page after update cookies")
 
         check_languages = self.page.run_js('return navigator.languages')
-        print(f"Check languages: {check_languages}")
+        logger.debug(f"Check languages: {check_languages}")
 
         # Find capcha iframe
         iframe = self.page.get_frame('@src^https://geo.captcha-delivery.com/captcha')
         if iframe:
             capcha_human_error = iframe.ele('.captcha__human')
             if capcha_human_error:
-                print(f"Capcha human error:{capcha_human_error.text}")
+                logger.warning(f"Capcha human error:{capcha_human_error.text}")
 
         # capcha_human_error = iframe.ele('.captcha__human')
         # if capcha_human_error:
         #     print(f"Capcha human error:{capcha_human_error.text}")
         else:
-            print("Capcha frame didn't find")
+            logger.info("Capcha frame didn't find")
 
         time.sleep(5)
 
         time.sleep(random.uniform(8, 12))
         cookies = self.page.cookies()
-        print(f"Check cookies: {cookies}")
+        logger.debug(f"Check cookies: {cookies}")
 
-        print(f"Page title after solve capcha: {self.page.title}")
+        logger.debug(f"Page title after solve capcha: {self.page.title}")
 
         self.page.get_screenshot(path=f"{BASE_DIR}/screenshots", name='UEFA_after_capcha_page.png', full_page=True)
 
         personal_account = self.page.wait.ele_displayed('#main_content_account_home_container', timeout=5)
         if personal_account:
             # TODO:
-            print("You are in you personal account!")
+            logger.success("You are in you personal account!")
 
         else:
             email = self.page.ele('xpath://*[@id="gigya-loginID-75579930407612940"]')
@@ -116,10 +120,16 @@ class UefaService:
             self.page.get_screenshot(path=f"{BASE_DIR}/screenshots", name='UEFA_after_login.png', full_page=True)
 
     def run(self):
-        self._login()
-        time.sleep(random.uniform(8, 12))
-        self.page.close()
-        self.page.quit()
+        try:
+            self._login()
+            time.sleep(random.uniform(8, 12))
+            self.page.close()
+            self.page.quit()
+        except Exception as e:
+            logger.error(e)
+        finally:
+            self.page.close()
+            self.page.quit()
 
 
 if __name__ == '__main__':

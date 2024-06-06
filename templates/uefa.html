@@ -26,8 +26,7 @@
         </div>
         <div class="col-md-4">
             <h2>Script settings</h2>
-<!--            <form action="{{ url_for('run_uefa_script_form') }}" method="post">-->
-            <form>
+            <form action="{{ url_for('run_uefa_script_form') }}" method="post">
                 <label for="email" class="form-labe mb-0l">UEFA User email:</label><br>
                 <input type="email" id="uefa_user_email" name="email" class="form-control" placeholder="name@example.com"><br>
                 <label for="password" class="form-label mb-0">UEFA User password:</label><br>
@@ -36,7 +35,9 @@
                 <hr>
                 <div>
                     <h3>Current session status</h3>
-                    <p>TODO: update by JS (one time per X seconds)</p>
+                    <div id="log-container">
+                        <p>Loading logs...</p>
+                    </div>
                 </div>
                 <hr>
                 <div>
@@ -53,4 +54,27 @@
         </div>
       </div>
     </div>
+
+<script>
+    async function fetchLogs() {
+        const response = await fetch('/api/v1/uefa/get_logs');
+        const logs = await response.json();
+
+        const logContainer = document.getElementById('log-container');
+        logContainer.innerHTML = '';
+
+        logs.forEach(log => {
+            const logElement = document.createElement('p');
+            logElement.textContent = log.text;
+            logContainer.appendChild(logElement);
+        });
+    }
+
+    // Fetch logs initially
+    fetchLogs();
+
+    // Fetch logs every 10 seconds
+    setInterval(fetchLogs, 10000);
+</script>
+
 {% endblock %}

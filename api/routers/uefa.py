@@ -1,3 +1,4 @@
+import os
 import time
 import json
 import uuid
@@ -9,10 +10,15 @@ from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import RedirectResponse
+from loguru import logger
 
 from variables import BASE_DIR
 from services.uefa import UefaService
 from utils import get_proxy_ip
+
+
+log_file_path = "logs/uefa_logs.json"
+logger.add(log_file_path, format="{time} {level} {message}", rotation="1 MB", serialize=True)
 
 UEFA_SESSION_PATH = f'{BASE_DIR}/services/uefa/uefa_sessions.json'
 SESSION_EXPIRE_TIME = 30
@@ -168,16 +174,17 @@ def run_uefa_script_form(email: str = Form(...), password: str = Form(...)):
     available_session = get_uefa_available_session()
 
     if not available_session:
-        raise HTTPException(detail="Available session didn't find", status_code=404)
+        logger.warning("Available session didn't find")
+        return RedirectResponse(url="/uefa", status_code=303)
 
     for session in available_session:
         session_ip = session["ip"]
         check_proxy_ip = get_proxy_ip(proxy=session["proxy"])
-        print(f"Session IP    : {session_ip}")
-        print(f"Check proxy IP: {check_proxy_ip}")
         if session_ip != check_proxy_ip:
+            logger.warning(f"Session IP:{session_ip} not equal Check proxy IP:{check_proxy_ip}")
             time.sleep(5)
             continue
+        logger.info(f"Session IP:{session_ip} is equal Check proxy IP:{check_proxy_ip}")
         UefaService(
             proxy_user=session["proxy"]["user"],
             proxy_host=session["proxy"]["host"],
@@ -186,6 +193,41 @@ def run_uefa_script_form(email: str = Form(...), password: str = Form(...)):
             user_email=email,
             user_password=password
         ).run()
+        logger.info("Finish UEFA script")
         return RedirectResponse(url="/uefa", status_code=303)  # TODO: Add error exceptions
 
-    raise HTTPException(detail="Use all available sessions", status_code=404)
+    logger.warning("Session IP not equal Check proxy IP")
+    logger.info("Finish UEFA script")
+    return RedirectResponse(url="/uefa", status_code=303)
+
+
+@router.get("/run_log_script")
+def run_log_script():
+    """
+    Create fake logs for test
+    """
+    for i in range(10):
+        logger.info(f"Test log: {i}")
+        logger.success(f"Test log: {i}")
+        time.sleep(5)
+    return {"message": "Test completed"}
+
+
+@router.get("/get_logs")
+def get_logs():
+    """
+    Get logs from files
+    """
+    with open(log_file_path, "r") as log_file:
+        logs = log_file.readlines()
+    log_for_site = []
+    for log in logs:
+        item = json.loads(log.strip())
+        if item["record"]["level"]["name"] != "DEBUG":
+            log_for_site.append({
+                "text": item["text"],
+                "time": item["record"]["time"],
+                "level": item["record"]["level"]["name"],
+                "message": item["record"]["message"]
+            })
+    return log_for_site

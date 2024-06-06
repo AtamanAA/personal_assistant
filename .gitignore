@@ -187,3 +187,4 @@ dbip-country-ipv4.csv
 /audio_capcha_files/
 /local_probe/
 /services/uefa/proxy_auth_plugin/
+/logs/uefa_logs.json
