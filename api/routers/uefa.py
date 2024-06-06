@@ -231,3 +231,16 @@ def get_logs():
                 "message": item["record"]["message"]
             })
     return log_for_site
+
+
+@router.delete("/clear_logs")
+def clear_logs():
+    """
+    Clears logs from the log file
+    """
+    try:
+        with open(log_file_path, "w") as log_file:
+            log_file.truncate(0)
+        return {"message": "Logs cleared successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

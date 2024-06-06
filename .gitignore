@@ -188,3 +188,4 @@ dbip-country-ipv4.csv
 /local_probe/
 /services/uefa/proxy_auth_plugin/
 /logs/uefa_logs.json
+/services/uefa/uefa_sessions.json
