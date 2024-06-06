@@ -14,9 +14,9 @@ def get_proxy_ip(proxy: dict):
             "http": f'http://{proxy["user"]}:{PROXY_PASSWORD}@{proxy["host"]}:{proxy["port"]}',
             "https": f'http://{proxy["user"]}:{PROXY_PASSWORD}@{proxy["host"]}:{proxy["port"]}'
         }
-        logger.info(f"Proxy: {proxies['http']}")
+        logger.debug(f"Proxy: {proxies['http']}")
         response = requests.get('https://httpbin.org/ip', proxies=proxies)
-        logger.info(f"{response.json()}")
+        logger.debug(f"{response.json()}")
         ip = response.json()['origin']
         return ip
     except Exception as error:

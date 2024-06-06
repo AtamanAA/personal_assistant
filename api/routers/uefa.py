@@ -14,7 +14,8 @@ from loguru import logger
 
 from variables import BASE_DIR
 from services.uefa import UefaService
-from utils import get_proxy_ip
+from utils import get_proxy_ip, check_proxy_list, get_proxies_list
+
 
 
 log_file_path = "logs/uefa_logs.json"
@@ -182,7 +183,7 @@ def run_uefa_script_form(email: str = Form(...), password: str = Form(...)):
         check_proxy_ip = get_proxy_ip(proxy=session["proxy"])
         if session_ip != check_proxy_ip:
             logger.warning(f"Session IP:{session_ip} not equal Check proxy IP:{check_proxy_ip}")
-            time.sleep(5)
+            time.sleep(10)
             continue
         logger.info(f"Session IP:{session_ip} is equal Check proxy IP:{check_proxy_ip}")
         UefaService(
@@ -244,3 +245,11 @@ def clear_logs():
         return {"message": "Logs cleared successfully"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/check_proxies")
+def check_proxies():
+    """
+    Check proxies list
+    """
+    return check_proxy_list(get_proxies_list())
