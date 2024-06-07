@@ -103,6 +103,15 @@ def create_proxy_auth_plugin(plugin_dir: str, proxy_user: str, proxy_host: str, 
             }};
 
         chrome.proxy.settings.set({{value: config, scope: "regular"}}, function() {{}});
+
+        function callbackFn(details) {{
+            return {{
+                authCredentials: {{
+                    username: "{proxy_user}",
+                    password: "{PROXY_PASSWORD}"
+                }}
+            }};
+        }}
         """
 
     # Create plugin directory if it doesn't exist
