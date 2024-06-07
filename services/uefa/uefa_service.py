@@ -41,13 +41,13 @@ class UefaService:
         logger.debug(f"Set languages")
         # options.set_argument("--accept-lang=en-US")
 
-        # options.set_address("localhost:9000")  # For local test without proxy
+        options.set_address("localhost:9000")  # For local test without proxy
 
-        create_proxy_auth_plugin(plugin_dir=self.plugin_dir, proxy_user=proxy_user, proxy_host=proxy_host,
-                                 proxy_port=proxy_port)
-        logger.debug(f"Create proxy auth plugin")
-        options.add_extension(self.plugin_dir)
-        logger.debug(f"Add proxy auth extension")
+        # create_proxy_auth_plugin(plugin_dir=self.plugin_dir, proxy_user=proxy_user, proxy_host=proxy_host,
+        #                          proxy_port=proxy_port)
+        # logger.debug(f"Create proxy auth plugin")
+        # options.add_extension(self.plugin_dir)
+        # logger.debug(f"Add proxy auth extension")
 
         self.page = ChromiumPage(addr_or_opts=options)
         logger.debug(f"Create Chrome page")
