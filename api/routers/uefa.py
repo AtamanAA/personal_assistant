@@ -54,6 +54,11 @@ class UserUEFA(BaseModel):
 
 
 def get_uefa_available_session():
+    if not os.path.exists(UEFA_SESSION_PATH):
+        # Create the file if it doesn't exist
+        with open(UEFA_SESSION_PATH, 'w') as file:
+            json.dump([], file)
+
     with open(UEFA_SESSION_PATH, 'r') as file:
         sessions_content = file.read()
     sessions = json.loads(sessions_content)
