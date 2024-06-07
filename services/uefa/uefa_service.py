@@ -27,8 +27,7 @@ class UefaService:
 
         self.data_dome_cookie = data_dome_cookie
 
-        self.plugin_dir = 'proxy_auth_plugin'
-        logger.debug(f"Plugin dir: {self.plugin_dir}")
+
 
         # self.user_agent = UserAgent(platforms='pc').random
         self.user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36'
@@ -46,7 +45,8 @@ class UefaService:
         options.set_user_data_path(user_data_path)
 
         # options.set_address("localhost:9000")  # For local test without proxy
-
+        self.plugin_dir = f'{BASE_DIR}/proxy_auth_plugin'
+        logger.debug(f"Plugin dir: {self.plugin_dir}")
         create_proxy_auth_plugin(plugin_dir=self.plugin_dir, proxy_user=proxy_user, proxy_host=proxy_host,
                                  proxy_port=proxy_port)
         logger.debug(f"Create proxy auth plugin")
