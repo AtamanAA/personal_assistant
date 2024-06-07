@@ -90,18 +90,7 @@ def create_proxy_auth_plugin(plugin_dir: str, proxy_user: str, proxy_host: str, 
     """
 
     background_js = f"""
-    var config = {{
-            mode: "fixed_servers",
-            rules: {{
-            singleProxy: {{
-                scheme: "http",
-                host: "{proxy_host}",
-                port: parseInt("{proxy_port}")
-            }},
-            bypassList: ["localhost", "127.0.0.1"]
-            }}
-        }};
-
+    var t=3;
     """
 
     # Create plugin directory if it doesn't exist

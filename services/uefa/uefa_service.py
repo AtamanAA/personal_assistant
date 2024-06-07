@@ -47,13 +47,13 @@ class UefaService:
         options.set_address("localhost:9090")  # For local test without proxy
         self.plugin_dir = f'{BASE_DIR}/proxy_auth_plugin'
         logger.debug(f"Plugin dir: {self.plugin_dir}")
-        # create_proxy_auth_plugin(plugin_dir=self.plugin_dir, proxy_user=proxy_user, proxy_host=proxy_host,
-        #                          proxy_port=proxy_port)
-        # logger.debug(f"Create proxy auth plugin")
-        # options.add_extension(self.plugin_dir)
-        # logger.debug(f"Add proxy auth extension")
-        #
-        # logger.debug(f"Check extension in options: {options.extensions}")
+        create_proxy_auth_plugin(plugin_dir=self.plugin_dir, proxy_user=proxy_user, proxy_host=proxy_host,
+                                 proxy_port=proxy_port)
+        logger.debug(f"Create proxy auth plugin")
+        options.add_extension(self.plugin_dir)
+        logger.debug(f"Add proxy auth extension")
+
+        logger.debug(f"Check extension in options: {options.extensions}")
 
         self.page = ChromiumPage(addr_or_opts=options)
         logger.debug(f"Create Chrome page")
