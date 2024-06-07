@@ -113,7 +113,10 @@ class UefaService:
 
         self.page.get_screenshot(path=f"{BASE_DIR}/screenshots", name='UEFA_after_capcha_page.png', full_page=True)
 
+        logger.debug(f"Save screenshot: UEFA_after_capcha_page.png")
+
         personal_account = self.page.wait.ele_displayed('#main_content_account_home_container', timeout=5)
+        logger.debug(f"Save screenshot")
         if personal_account:
             # TODO:
             logger.success("You are in you personal account!")
@@ -121,14 +124,17 @@ class UefaService:
         else:
             email = self.page.ele('xpath://*[@id="gigya-loginID-75579930407612940"]')
             email.input(self.user_email)
+            logger.debug(f"Input user email")
             password = self.page.ele('xpath://*[@id="gigya-password-32665041627364124"]')
             password.input(self.user_password)
+            logger.debug(f"Input user password")
 
             submit_button = self.page.ele('xpath://*[@id="gigya-login-form"]/div[4]/div/input')
             submit_button.click()
 
             time.sleep(random.uniform(8, 12))
             self.page.get_screenshot(path=f"{BASE_DIR}/screenshots", name='UEFA_after_login.png', full_page=True)
+            logger.debug(f"Save screenshot: UEFA_after_login.png")
 
     def run(self):
         try:
