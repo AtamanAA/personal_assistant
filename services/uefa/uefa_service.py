@@ -19,6 +19,7 @@ class UefaService:
     def __init__(self, proxy_user: str, proxy_host: str, proxy_port: str,
                  data_dome_cookie: str,
                  user_email: str = UEFA_EMAIL, user_password: str = UEFA_PASSWORD):
+        logger.debug(f"Start init UefaService class")
         self.login_url = LOGIN_URL
         self.ticket_url = TICKET_URL
         self.user_email = user_email
@@ -27,25 +28,29 @@ class UefaService:
         self.data_dome_cookie = data_dome_cookie
 
         self.plugin_dir = 'proxy_auth_plugin'
+        logger.debug(f"Plugin dir: {self.plugin_dir}")
 
         # self.user_agent = UserAgent(platforms='pc').random
         self.user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36'
 
-        logger.debug(f"Set User-agent: {self.user_agent}")
-
         options = ChromiumOptions()
         options.headless(True)
         options.set_user_agent(user_agent=self.user_agent)
+        logger.debug(f"Set User-agent: {self.user_agent}")
         options.set_argument("--accept-lang=en-US,uk;q=0.9")
+        logger.debug(f"Set languages")
         # options.set_argument("--accept-lang=en-US")
 
         # options.set_address("localhost:9000")  # For local test without proxy
 
         create_proxy_auth_plugin(plugin_dir=self.plugin_dir, proxy_user=proxy_user, proxy_host=proxy_host,
                                  proxy_port=proxy_port)
+        logger.debug(f"Create proxy auth plugin")
         options.add_extension(self.plugin_dir)
+        logger.debug(f"Add proxy auth extension")
 
         self.page = ChromiumPage(addr_or_opts=options)
+        logger.debug(f"Create Chrome page")
         self.page.clear_cache(cookies=True)  # For debug only
 
     def _get_url(self, url: str):

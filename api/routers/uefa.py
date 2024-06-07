@@ -186,6 +186,7 @@ def run_uefa_script_form(email: str = Form(...), password: str = Form(...)):
             time.sleep(10)
             continue
         logger.info(f"Session IP:{session_ip} is equal Check proxy IP:{check_proxy_ip}")
+        time.sleep(10)
         UefaService(
             proxy_user=session["proxy"]["user"],
             proxy_host=session["proxy"]["host"],
