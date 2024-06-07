@@ -139,6 +139,13 @@ class UefaService:
 
 if __name__ == '__main__':
     try:
-        UefaService().run()
+        UefaService(
+            proxy_user="1GbgvO_0",
+            proxy_host="rg-10340.sp1.ovh",
+            proxy_port="11001",
+            data_dome_cookie="test_cookie",
+            user_email=UEFA_EMAIL,
+            user_password=UEFA_PASSWORD
+        ).run()
     except Exception as error:
         print(error)

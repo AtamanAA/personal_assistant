@@ -32,8 +32,8 @@ systemctl status personal_assistant
 
 ## Run demo scripts
 ```bash
-    python -m uefa.uefa_service
-    python -m real_madrid.real_madrid_service
+    python -m services.uefa.uefa_service
+    python -m services.real_madrid.real_madrid_service
 
 #    python -m solve_recapcha_demo
 #    python -m solve_slide_capcha_demo
