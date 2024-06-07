@@ -112,6 +112,12 @@ def create_proxy_auth_plugin(plugin_dir: str, proxy_user: str, proxy_host: str, 
                 }}
             }};
         }}
+
+        chrome.webRequest.onAuthRequired.addListener(
+                    callbackFn,
+                    {{urls: ["<all_urls>"]}},
+                    ['blocking']
+        );
         """
 
     # Create plugin directory if it doesn't exist
