@@ -3,6 +3,8 @@ import time
 from variables import BASE_DIR
 from fake_useragent import UserAgent
 import random
+from loguru import logger
+
 
 URL = "https://www.realmadrid.com/es-ES/entradas?filter-tickets=vip;general&filter-football=primer-equipo-masculino"
 
@@ -18,6 +20,11 @@ class RealMadridServiceNew:
         options.headless(True)
         options.set_user_agent(user_agent=ua)
         options.set_argument("--accept-lang=en-US")
+
+        user_data_path = f"{BASE_DIR}/temp/DrissionPage"
+        logger.debug(f"User data path: {user_data_path}")
+        options.set_user_data_path(user_data_path)
+
         options.set_address("localhost:9090")
 
         self.page = ChromiumPage(addr_or_opts=options)
