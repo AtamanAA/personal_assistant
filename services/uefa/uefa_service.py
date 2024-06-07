@@ -40,7 +40,7 @@ class UefaService:
         logger.debug(f"Set languages")
         # options.set_argument("--accept-lang=en-US")
 
-        user_data_path = f"{BASE_DIR}/temp/DrissionPage"
+        user_data_path = f"{BASE_DIR}/temp/DrissionPage/userData_9000"
         logger.debug(f"User data path: {user_data_path}")
         options.set_user_data_path(user_data_path)
 
@@ -52,6 +52,8 @@ class UefaService:
         logger.debug(f"Create proxy auth plugin")
         options.add_extension(self.plugin_dir)
         logger.debug(f"Add proxy auth extension")
+
+        logger.debug(f"Check extension in options: {options.extensions}")
 
         self.page = ChromiumPage(addr_or_opts=options)
         logger.debug(f"Create Chrome page")
