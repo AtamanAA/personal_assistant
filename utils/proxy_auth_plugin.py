@@ -101,6 +101,8 @@ def create_proxy_auth_plugin(plugin_dir: str, proxy_user: str, proxy_host: str, 
                 bypassList: ["localhost", "127.0.0.1"]
                 }}
             }};
+
+        chrome.proxy.settings.set({{value: config, scope: "regular"}}, function() {{}});
         """
 
     # Create plugin directory if it doesn't exist
