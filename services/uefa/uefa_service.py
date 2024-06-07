@@ -41,6 +41,10 @@ class UefaService:
         logger.debug(f"Set languages")
         # options.set_argument("--accept-lang=en-US")
 
+        user_data_path = f"{BASE_DIR}/temp/DrissionPage"
+        logger.debug(f"User data path: {user_data_path}")
+        options.set_user_data_path(user_data_path)
+
         options.set_address("localhost:9000")  # For local test without proxy
 
         # create_proxy_auth_plugin(plugin_dir=self.plugin_dir, proxy_user=proxy_user, proxy_host=proxy_host,
