@@ -44,7 +44,7 @@ class UefaService:
 
         # options.set_argument('--start-maximized')
 
-        # options.set_address("localhost:9090")  # For local test without proxy
+        options.set_address("localhost:9090")  # For local test without proxy
         self.plugin_dir = f'{BASE_DIR}/proxy_auth_plugin'
         logger.debug(f"Plugin dir: {self.plugin_dir}")
         create_proxy_auth_plugin(plugin_dir=self.plugin_dir, proxy_user=proxy_user, proxy_host=proxy_host,
