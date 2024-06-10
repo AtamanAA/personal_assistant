@@ -5,7 +5,7 @@ import uuid
 from datetime import datetime, timedelta
 from typing import List
 
-from fastapi import APIRouter, HTTPException, Request, Form
+from fastapi import APIRouter, HTTPException, Request, Form, Response
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field
 from fastapi.templating import Jinja2Templates
@@ -17,8 +17,8 @@ from services.uefa import UefaService
 from utils import get_proxy_ip, check_proxy_list, get_proxies_list
 
 
-
 log_file_path = "logs/uefa_logs.json"
+logger.remove()
 logger.add(log_file_path, format="{time} {level} {message}", rotation="1 MB", serialize=True)
 
 UEFA_SESSION_PATH = f'{BASE_DIR}/services/uefa/uefa_sessions.json'
@@ -177,6 +177,7 @@ def run_uefa_script_form(email: str = Form(...), password: str = Form(...)):
     """
     Run UEFA script
     """
+    logger.info(f"Run UEFA script")
     available_session = get_uefa_available_session()
 
     if not available_session:
@@ -187,12 +188,13 @@ def run_uefa_script_form(email: str = Form(...), password: str = Form(...)):
         session_ip = session["ip"]
         check_proxy_ip = get_proxy_ip(proxy=session["proxy"])
         if session_ip != check_proxy_ip:
-            logger.warning(f"Session IP:{session_ip} not equal Check proxy IP:{check_proxy_ip}")
+            logger.debug(f"Session IP:{session_ip} not equal Check proxy IP:{check_proxy_ip}")
             time.sleep(10)
             continue
-        logger.info(f"Session IP:{session_ip} is equal Check proxy IP:{check_proxy_ip}")
+        logger.debug(f"Session IP:{session_ip} is equal Check proxy IP:{check_proxy_ip}")
+        logger.info(f"Try use session IP:{session_ip}")
         time.sleep(10)
-        UefaService(
+        script_result = UefaService(
             proxy_user=session["proxy"]["user"],
             proxy_host=session["proxy"]["host"],
             proxy_port=session["proxy"]["port"],
@@ -200,24 +202,16 @@ def run_uefa_script_form(email: str = Form(...), password: str = Form(...)):
             user_email=email,
             user_password=password
         ).run()
-        logger.info("Finish UEFA script")
-        return RedirectResponse(url="/uefa", status_code=303)  # TODO: Add error exceptions
 
-    logger.warning("Session IP not equal Check proxy IP")
+        if script_result:
+            logger.info("Finish UEFA script")
+            return RedirectResponse(url="/uefa", status_code=303)
+        else:
+            continue
+
+    logger.warning("Didn't find any correct IP from available sessions")
     logger.info("Finish UEFA script")
     return RedirectResponse(url="/uefa", status_code=303)
-
-
-@router.get("/run_log_script")
-def run_log_script():
-    """
-    Create fake logs for test
-    """
-    for i in range(10):
-        logger.info(f"Test log: {i}")
-        logger.success(f"Test log: {i}")
-        time.sleep(5)
-    return {"message": "Test completed"}
 
 
 @router.get("/get_logs")
@@ -227,16 +221,20 @@ def get_logs():
     """
     with open(log_file_path, "r") as log_file:
         logs = log_file.readlines()
+    unique_text = set()
     log_for_site = []
     for log in logs:
         item = json.loads(log.strip())
-        if item["record"]["level"]["name"] != "DEBUG":
-            log_for_site.append({
-                "text": item["text"],
-                "time": item["record"]["time"],
-                "level": item["record"]["level"]["name"],
-                "message": item["record"]["message"]
-            })
+        item_log_level = item["record"]["level"]["name"]
+        if item_log_level == "INFO":
+            if item["text"] not in unique_text:
+                log_for_site.append({
+                    "text": item["text"],
+                    "time": item["record"]["time"],
+                    "level": item["record"]["level"]["name"],
+                    "message": item["record"]["message"]
+                })
+                unique_text.add(item["text"])
     return log_for_site
 
 
@@ -259,3 +257,34 @@ def check_proxies():
     Check proxies list
     """
     return check_proxy_list(get_proxies_list())
+
+
+@router.get("/get_last_screenshot")
+def get_last_screenshot():
+    """
+    Get the last screenshot for UEFA
+    """
+
+    screen_short_dir = f"{BASE_DIR}/screenshots/uefa"
+
+    if not os.path.exists(screen_short_dir):
+        raise HTTPException(status_code=404, detail="Screenshot directory not found")
+
+    # List all files in the directory
+    files = [os.path.join(screen_short_dir, file) for file in os.listdir(screen_short_dir) if
+             os.path.isfile(os.path.join(screen_short_dir, file))]
+
+    if not files:
+        raise HTTPException(status_code=404, detail="No screenshots found")
+
+    # Get the most recent file by modification date
+    latest_file = max(files, key=os.path.getmtime)
+
+    if not latest_file:
+        raise HTTPException(status_code=404, detail="No screenshots found")
+
+    # Read the content of the file (assuming it's an image, you may want to handle it differently)
+    with open(latest_file, "rb") as f:
+        file_content = f.read()
+
+    return Response(content=file_content, media_type="image/png")

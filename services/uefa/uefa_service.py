@@ -1,12 +1,12 @@
 import random
 import time
+from datetime import datetime
 
 from DrissionPage import ChromiumPage, ChromiumOptions
 from loguru import logger
 
 from utils import create_proxy_auth_plugin
 from variables import UEFA_EMAIL, UEFA_PASSWORD, BASE_DIR
-
 
 log_file_path = "logs/uefa_logs.json"
 logger.add(log_file_path, format="{time} {level} {message}", rotation="1 MB", serialize=True)
@@ -26,8 +26,6 @@ class UefaService:
         self.user_password = user_password
 
         self.data_dome_cookie = data_dome_cookie
-
-
 
         # self.user_agent = UserAgent(platforms='pc').random
         self.user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36'
@@ -58,6 +56,9 @@ class UefaService:
         self.page = ChromiumPage(addr_or_opts=options)
         logger.debug(f"Create Chrome page")
         self.page.clear_cache(cookies=True)  # For debug only
+
+        self.successfully_completed = False
+        self.screenshots_dir = f"{BASE_DIR}/screenshots/uefa"
 
     def _get_url(self, url: str):
         logger.info(f"Get url: {url}")
@@ -95,7 +96,7 @@ class UefaService:
         if iframe:
             capcha_human_error = iframe.ele('.captcha__human')
             if capcha_human_error:
-                logger.warning(f"Capcha human error:{capcha_human_error.text}")
+                logger.debug(f"Capcha human error:{capcha_human_error.text}")
 
         # capcha_human_error = iframe.ele('.captcha__human')
         # if capcha_human_error:
@@ -111,9 +112,9 @@ class UefaService:
 
         logger.debug(f"Page title after solve capcha: {self.page.title}")
 
-        self.page.get_screenshot(path=f"{BASE_DIR}/screenshots", name='UEFA_after_capcha_page.png', full_page=True)
+        self.page.get_screenshot(path=self.screenshots_dir, name=f'UEFA_{datetime.now()}.png', full_page=True)
 
-        logger.debug(f"Save screenshot: UEFA_after_capcha_page.png")
+        logger.debug(f"Save screenshot for UEFA after capcha page")
 
         personal_account = self.page.wait.ele_displayed('#main_content_account_home_container', timeout=5)
         logger.debug(f"Save screenshot")
@@ -133,8 +134,11 @@ class UefaService:
             submit_button.click()
 
             time.sleep(random.uniform(8, 12))
-            self.page.get_screenshot(path=f"{BASE_DIR}/screenshots", name='UEFA_after_login.png', full_page=True)
-            logger.debug(f"Save screenshot: UEFA_after_login.png")
+            self.page.get_screenshot(path=self.screenshots_dir, name=f'UEFA_{datetime.now()}.png', full_page=True)
+            logger.debug(f"Save screenshot for UEFA after login")
+            logger.success("You are in you personal account!")
+
+            self.successfully_completed = True
 
     def run(self):
         try:
@@ -144,9 +148,11 @@ class UefaService:
             self.page.quit()
         except Exception as e:
             logger.error(e)
+            logger.info(f"Exception error")
         finally:
             self.page.close()
             self.page.quit()
+            return self.successfully_completed
 
 
 if __name__ == '__main__':
