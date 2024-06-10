@@ -42,7 +42,7 @@ class UefaService:
         logger.debug(f"User data path: {user_data_path}")
         options.set_user_data_path(user_data_path)
 
-        # options.set_argument('--start-maximized')
+        options.set_argument('--start-maximized')
 
         options.set_address("localhost:9090")  # For local test without proxy
         self.plugin_dir = f'{BASE_DIR}/proxy_auth_plugin'
