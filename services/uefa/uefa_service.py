@@ -106,7 +106,7 @@ class UefaService:
         else:
             logger.info("Capcha frame didn't find")
 
-        time.sleep(5)
+        # time.sleep(5)
 
         time.sleep(random.uniform(8, 12))
         cookies = self.page.cookies()
@@ -119,7 +119,6 @@ class UefaService:
         logger.debug(f"Save screenshot for UEFA after capcha page")
 
         personal_account = self.page.wait.ele_displayed('#main_content_account_home_container', timeout=5)
-        logger.debug(f"Save screenshot")
         if personal_account:
             # TODO:
             logger.success("You are in you personal account!")
