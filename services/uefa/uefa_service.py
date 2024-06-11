@@ -99,6 +99,8 @@ class UefaService:
             capcha_human_error = iframe.ele('.captcha__human')
             if capcha_human_error:
                 logger.debug(f"Capcha human error:{capcha_human_error.text}")
+                if "You have been blocked." in capcha_human_error:
+                    logger.info("You have been blocked.")
 
         # capcha_human_error = iframe.ele('.captcha__human')
         # if capcha_human_error:
