@@ -18,7 +18,7 @@
         <input type="submit" class="btn btn-success" value="Run uefa script">
         <hr>
         <div>
-          <h3>Current session status: _____ #TODO</h3>
+          <h3>Status last task: <span id="status-container">_____ #TODO</span></h3>
         </div>
 
         <div>
@@ -29,7 +29,7 @@
         </div>
 
         <div>
-          <h3>Current session logs</h3>
+          <h3>Last task logs</h3>
           <div id="log-container">
             <p>Loading logs...</p>
           </div>
@@ -105,6 +105,32 @@
 
     // Fetch screenshot every 10 seconds
     setInterval(fetchScreenshot, 10000);
+
+
+
+
+
+    async function fetchStatus() {
+        const response = await fetch('/api/v1/uefa/get_task_status');
+        const status = await response.json();
+
+        const StatusContainer = document.getElementById('status-container');
+        StatusContainer.innerHTML = '';
+
+        const StatusElement = document.createElement('span');
+        StatusElement.textContent = status;
+        StatusContainer.appendChild(StatusElement);
+
+    }
+
+    // Fetch status initially
+    fetchStatus();
+
+    // Fetch status every 10 seconds
+    setInterval(fetchStatus, 10000);
+
+
+
 
 
 </script>

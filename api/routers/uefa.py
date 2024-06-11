@@ -7,7 +7,7 @@ import requests
 from datetime import datetime, timedelta
 from typing import List, Optional
 
-from fastapi import APIRouter, HTTPException, Request, Form, Response
+from fastapi import APIRouter, HTTPException, Request, Form, Response, BackgroundTasks
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field
 from fastapi.templating import Jinja2Templates
@@ -19,12 +19,13 @@ from services.uefa import UefaService
 from utils import get_proxy_ip, check_proxy_list, get_proxies_list, find_proxy_by_ip
 
 
-log_file_path = "logs/uefa_logs.json"
+log_file_path = f"{BASE_DIR}/logs/uefa_logs.json"
 # logger.remove()
 logger.add(log_file_path, format="{time} {level} {message}", rotation="1 MB", serialize=True)
 logger.add(sys.stdout, level="DEBUG")
 
 UEFA_SESSION_PATH = f'{BASE_DIR}/services/uefa/uefa_sessions.json'
+UEFA_TASKS_PATH = f'{BASE_DIR}/services/uefa/uefa_tasks.json'
 SESSION_EXPIRE_TIME = 30
 
 tag = "UEFA"
@@ -54,6 +55,13 @@ class Session(SessionBase):
 class UserUEFA(BaseModel):
     email: str
     password: str
+
+
+class TaskUEFA(BaseModel):
+    id: str
+    email: str
+    status: str
+    created_at: datetime = Field(default_factory=datetime.now)
 
 
 def get_uefa_available_session():
@@ -183,21 +191,40 @@ def run_uefa_script(user_info: UserUEFA):
     raise HTTPException(detail="Use all available sessions", status_code=404)
 
 
-@router.post("/run_uefa_script_form",
-             # response_model=Session
-             )
-def run_uefa_script_form(email: str = Form(...), password: str = Form(...)):
-    """
-    Run UEFA script
-    """
+def set_task_status(id: str, email: str, status: str):
+    if not os.path.exists(UEFA_TASKS_PATH):
+        with open(UEFA_TASKS_PATH, 'w') as file:
+            json.dump([], file)
+
+    with open(UEFA_TASKS_PATH, 'r') as file:
+        tasks_content = file.read() or "[]"
+    tasks = json.loads(tasks_content)
+
+    if status == "processing":
+        tasks.append(TaskUEFA(id=id, email=email, status=status).dict())
+
+    else:
+        for task in tasks:
+            if task["id"] == id:
+                task["status"] = status
+
+    with open(UEFA_TASKS_PATH, 'w') as file:
+        file.write(json.dumps(tasks, default=str, indent=4))
+
+    return True
+
+
+def uefa_script(email: str, password: str):
     clear_logs()
+    task_id = str(uuid.uuid4())
+    set_task_status(id=task_id, email=email, status="processing")
     logger.info(f"Run UEFA script")
     available_session = get_uefa_available_session()
 
     if not available_session:
         logger.info("Available session didn't find")
-        logger.info("Finish UEFA script")
-        return RedirectResponse(url="/uefa", status_code=303)
+        logger.info("Failed UEFA script")
+        set_task_status(id=task_id, email=email, status="failed")
 
     for session in available_session:
         session_ip = session["ip"]
@@ -220,12 +247,22 @@ def run_uefa_script_form(email: str = Form(...), password: str = Form(...)):
 
         if script_result:
             logger.info("Finish UEFA script")
-            return RedirectResponse(url="/uefa", status_code=303)
+            set_task_status(id=task_id, email=email, status="completed")
+            break
         else:
             continue
 
     logger.warning("Didn't find any correct IP from available sessions")
     logger.info("Finish UEFA script")
+    set_task_status(id=task_id, email=email, status="failed")
+
+
+@router.post("/run_uefa_script_form")
+def run_uefa_script_form(background_tasks: BackgroundTasks, email: str = Form(...), password: str = Form(...)):
+    """
+    Run UEFA script in background task
+    """
+    background_tasks.add_task(uefa_script, email=email, password=password)
     return RedirectResponse(url="/uefa", status_code=303)
 
 
@@ -303,3 +340,17 @@ def get_last_screenshot():
         file_content = f.read()
 
     return Response(content=file_content, media_type="image/png")
+
+
+@router.get("/get_task_status")
+def get_task_status():
+    """
+    Get the last task status
+    """
+    with open(UEFA_TASKS_PATH, 'r') as file:
+        tasks_content = file.read() or "[]"
+    tasks = json.loads(tasks_content)
+    if not tasks:
+        return "undefined"
+    last_task = tasks[-1]
+    return last_task["status"].capitalize()
