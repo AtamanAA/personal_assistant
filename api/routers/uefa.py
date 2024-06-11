@@ -93,6 +93,7 @@ def add_session(new_session: SessionBase):
     """
     Add a new session for UEFA
     """
+    logger.debug(f"Try add new uefa session | Session data: {new_session}")
     with open(UEFA_SESSION_PATH, 'r') as file:
         sessions_content = file.read()
     sessions = json.loads(sessions_content)
