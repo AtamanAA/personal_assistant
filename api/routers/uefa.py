@@ -1,4 +1,5 @@
 import os
+import sys
 import time
 import json
 import uuid
@@ -21,6 +22,7 @@ from utils import get_proxy_ip, check_proxy_list, get_proxies_list, find_proxy_b
 log_file_path = "logs/uefa_logs.json"
 # logger.remove()
 logger.add(log_file_path, format="{time} {level} {message}", rotation="1 MB", serialize=True)
+logger.add(sys.stdout, level="DEBUG")
 
 UEFA_SESSION_PATH = f'{BASE_DIR}/services/uefa/uefa_sessions.json'
 SESSION_EXPIRE_TIME = 30
