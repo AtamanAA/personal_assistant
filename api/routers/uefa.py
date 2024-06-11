@@ -2,8 +2,9 @@ import os
 import time
 import json
 import uuid
+import requests
 from datetime import datetime, timedelta
-from typing import List
+from typing import List, Optional
 
 from fastapi import APIRouter, HTTPException, Request, Form, Response
 from fastapi.responses import HTMLResponse
@@ -14,7 +15,7 @@ from loguru import logger
 
 from variables import BASE_DIR
 from services.uefa import UefaService
-from utils import get_proxy_ip, check_proxy_list, get_proxies_list
+from utils import get_proxy_ip, check_proxy_list, get_proxies_list, find_proxy_by_ip
 
 
 log_file_path = "logs/uefa_logs.json"
@@ -37,7 +38,7 @@ class Proxy(BaseModel):
 
 
 class SessionBase(BaseModel):
-    proxy: Proxy
+    proxy: Optional[Proxy]
     ip: str
     data_dome_cookie: str
 
@@ -94,7 +95,16 @@ def add_session(new_session: SessionBase):
         sessions_content = file.read()
     sessions = json.loads(sessions_content)
 
-    # sessions.append(new_session.dict())
+    if not new_session.proxy:
+        logger.debug("Try find IP in proxy list")
+        proxy_export_list = get_proxies_list()
+        proxy = find_proxy_by_ip(proxy_list=proxy_export_list, ip=new_session.ip)
+        if not proxy:
+            raise HTTPException(detail="IP didn't find from proxy list", status_code=404)
+        if proxy:
+            logger.debug(f"Found IP in proxy list. Proxy: {proxy}")
+            new_session.proxy = Proxy(user=proxy["username"], host=proxy["ip"], port=str(proxy["port"]))
+
     sessions.append(Session(**new_session.dict()).dict())
 
     with open(UEFA_SESSION_PATH, 'w') as file:
