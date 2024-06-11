@@ -137,7 +137,7 @@ class UefaService:
             time.sleep(random.uniform(8, 12))
             self.page.get_screenshot(path=self.screenshots_dir, name=f'UEFA_{datetime.now()}.png', full_page=True)
             logger.debug(f"Save screenshot for UEFA after login")
-            logger.success("You are in you personal account!")
+            logger.info("You are in you personal account!")
 
             self.successfully_completed = True
 

@@ -190,11 +190,13 @@ def run_uefa_script_form(email: str = Form(...), password: str = Form(...)):
     """
     Run UEFA script
     """
+    clear_logs()
     logger.info(f"Run UEFA script")
     available_session = get_uefa_available_session()
 
     if not available_session:
-        logger.warning("Available session didn't find")
+        logger.info("Available session didn't find")
+        logger.info("Finish UEFA script")
         return RedirectResponse(url="/uefa", status_code=303)
 
     for session in available_session:
