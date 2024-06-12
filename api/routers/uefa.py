@@ -20,9 +20,11 @@ from utils import get_proxy_ip, check_proxy_list, get_proxies_list, find_proxy_b
 
 
 log_file_path = f"{BASE_DIR}/logs/uefa_logs.json"
+core_log_file_path = f"{BASE_DIR}/logs/core_uefa_logs.json"
 # logger.remove()
 logger.add(log_file_path, format="{time} {level} {message}", rotation="1 MB", serialize=True)
-logger.add(sys.stdout, level="DEBUG")
+logger.add(core_log_file_path, format="{time} {level} {message}", rotation="1 MB", serialize=True)
+# logger.add(sys.stdout, level="DEBUG")
 
 UEFA_SESSION_PATH = f'{BASE_DIR}/services/uefa/uefa_sessions.json'
 UEFA_TASKS_PATH = f'{BASE_DIR}/services/uefa/uefa_tasks.json'
@@ -96,11 +98,7 @@ def get_sessions():
     return sessions
 
 
-@router.post("/sessions", response_model=Session)
-def add_session(new_session: SessionBase):
-    """
-    Add a new session for UEFA
-    """
+def add_new_session(new_session: SessionBase):
     logger.debug(f"Try add new uefa session | Session data: {new_session}")
     with open(UEFA_SESSION_PATH, 'r') as file:
         sessions_content = file.read()
@@ -121,7 +119,11 @@ def add_session(new_session: SessionBase):
     with open(UEFA_SESSION_PATH, 'w') as file:
         file.write(json.dumps(sessions, default=str, indent=4))
 
-    return new_session
+
+@router.post("/sessions")
+def add_session(background_tasks: BackgroundTasks, new_session: SessionBase):
+    background_tasks.add_task(add_new_session, new_session=new_session)
+    return "Session data sent for processing"
 
 
 @router.post("/sessions_form", response_model=Session)
