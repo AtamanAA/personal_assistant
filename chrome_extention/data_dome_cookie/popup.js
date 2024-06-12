@@ -53,4 +53,42 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+
+
+    var removeButton = document.getElementById('removeButton');
+    removeButton.addEventListener('click', function() {
+        // Extract the cookie
+        chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+            if (tabs[0]) { // Check if tabs[0] exists
+                chrome.cookies.get({ url: tabs[0].url, name: "datadome" }, function(cookie) {
+                    if (cookie) {
+                        // Set the datadome cookie to an empty string
+                        chrome.cookies.set({
+                            url: tabs[0].url,
+                            name: "datadome",
+                            value: "",
+                            domain: cookie.domain,
+                            path: cookie.path,
+                            secure: cookie.secure,
+                            httpOnly: cookie.httpOnly,
+                            sameSite: cookie.sameSite,
+                            expirationDate: cookie.expirationDate
+                        }, function(newCookie) {
+                            if (newCookie) {
+                                console.log('Datadome cookie set to an empty value:', newCookie);
+                                alert('Remove data dome cookies')
+                            } else {
+                                console.error('Failed to set the datadome cookie to an empty value.');
+                            }
+                        });
+                    } else {
+                        console.error("No 'datadome' cookie found.");
+                    }
+                });
+            } else {
+                console.error("No active tab found.");
+            }
+        });
+    });
+
 });
