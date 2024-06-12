@@ -70,7 +70,9 @@ class UefaService:
         logger.info("Start login")
 
         self._get_url(url=self.login_url)
+        self.page.get_screenshot(path=self.screenshots_dir, name=f'UEFA_{datetime.now()}.png', full_page=True)
         time.sleep(random.uniform(8, 12))
+        self.page.get_screenshot(path=self.screenshots_dir, name=f'UEFA_{datetime.now()}.png', full_page=True)
 
         check_cookies = self.page.cookies()
         logger.debug(f"Check cookie:{check_cookies}")
