@@ -108,9 +108,9 @@ class UefaService:
         else:
             logger.info("Capcha frame didn't find")
 
-        # time.sleep(5)
+        # time.sleep(random.uniform(8, 12))
+        self.page.wait.ele_displayed('#idp-personalized__panel', timeout=20)
 
-        time.sleep(random.uniform(8, 12))
         cookies = self.page.cookies()
         logger.debug(f"Check cookies: {cookies}")
 
@@ -136,7 +136,8 @@ class UefaService:
             submit_button = self.page.ele('xpath://*[@id="gigya-login-form"]/div[4]/div/input')
             submit_button.click()
 
-            time.sleep(random.uniform(8, 12))
+            # time.sleep(random.uniform(8, 12))
+            self.page.wait.ele_displayed('#page', timeout=20)
             self.page.get_screenshot(path=self.screenshots_dir, name=f'UEFA_{datetime.now()}.png', full_page=True)
             logger.debug(f"Save screenshot for UEFA after login")
             logger.info("You are in you personal account!")
