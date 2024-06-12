@@ -1,0 +1,29 @@
+{
+  "manifest_version": 3,
+  "name": "Cookie Extractor",
+  "version": "2.0",
+  "description": "Extracts 'datadome' cookie and stores it locally.",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "cookies",
+    "scripting",
+    "downloads"
+  ],
+  "host_permissions": [
+    "*://*.zocdoc.com/*",
+    "*://*.uefa.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": "icon.png"
+  },
+  "icons": {
+    "16": "icon.png",
+    "48": "icon.png",
+    "128": "icon.png"
+  }
+}
