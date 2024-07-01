@@ -248,15 +248,16 @@ def uefa_script(email: str, password: str):
         ).run()
 
         if script_result:
-            logger.info("Finish UEFA script")
+            logger.info("Successful finish UEFA script")
             set_task_status(id=task_id, email=email, status="completed")
-            break
+            return True
         else:
             continue
 
     logger.warning("Didn't find any correct IP from available sessions")
     logger.info("Finish UEFA script")
     set_task_status(id=task_id, email=email, status="failed")
+    return False
 
 
 @router.post("/run_uefa_script_form")
